@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--
         Base application theme, dependent on API level. This theme is replaced
@@ -15,6 +15,16 @@
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+    </style>
+
+    <style name="PrioButton">
+        <item name="android:layout_width">@dimen/prio_button_width</item>
+        <item name="android:layout_height">@dimen/prio_button_height</item>
+        <item name="android:layout_below">@+id/btn_record</item>
+        <item name="android:background">@color/prio_not_selected</item>
+        <item name="android:layout_marginTop">@dimen/line_space</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
     </style>
 
 </resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="prio_selected">#8888FF</color>
+    <color name="prio_not_selected">#888888</color>
+
+</resources>
