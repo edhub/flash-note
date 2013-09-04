@@ -2,8 +2,33 @@
 
     <item
         android:id="@+id/act_new"
+        android:onClick="newNote"
         android:orderInCategory="100"
         android:showAsAction="always"
         android:title="@string/add_note"/>
+    <item
+        android:id="@+id/act_upcoming"
+        android:onClick="showUpcoming"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/upcoming"/>
+    <item
+        android:id="@+id/act_past"
+        android:onClick="showPast"
+        android:orderInCategory="200"
+        android:showAsAction="never"
+        android:title="@string/past"/>
+    <item
+        android:id="@+id/act_no_duedate"
+        android:onClick="showNoDuedate"
+        android:orderInCategory="200"
+        android:showAsAction="never"
+        android:title="@string/no_duedate"/>
+    <item
+        android:id="@+id/act_all"
+        android:onClick="showAll"
+        android:orderInCategory="300"
+        android:showAsAction="never"
+        android:title="@string/all"/>
 
 </menu>

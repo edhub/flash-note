@@ -10,7 +10,13 @@
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="press_to_record">Press to Record</string>
+    <string name="play">Play</string>
     <string name="description">Description</string>
     <string name="add_note">New</string>
+    <string name="basic_info_missing">Please record a voice or enter some description!</string>
+    <string name="upcoming">Upcoming</string>
+    <string name="past">Past</string>
+    <string name="no_duedate">No Duedate</string>
+    <string name="all">All</string>
 
 </resources>

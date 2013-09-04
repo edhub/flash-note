@@ -6,11 +6,13 @@ import android.content.ContentValues;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.Toast;
 
 public class AddNoteActivity extends Activity {
 
@@ -18,7 +20,13 @@ public class AddNoteActivity extends Activity {
 
     private long sDueDate;
 
+    private boolean sDiscardNote = true;
+
+    private boolean sIsRecording = false;
+
     private String sVoiceFile = "";
+
+    private VoiceHelper sVoiceHelper;
 
     private int sBgSelected;
 
@@ -34,7 +42,7 @@ public class AddNoteActivity extends Activity {
 
         final TextView tv_date = (TextView)findViewById(R.id.tv_date);
         SeekBar sb_date = (SeekBar)findViewById(R.id.sb_date);
-        sb_date.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+        sb_date.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
             }
@@ -48,12 +56,66 @@ public class AddNoteActivity extends Activity {
                 tv_date.setText(getTime(progress));
             }
         });
+
+        sVoiceHelper = new VoiceHelper(this);
+        final Button btn_play = (Button)findViewById(R.id.btn_play);
+        final Button btn_record = (Button)findViewById(R.id.btn_record);
+        btn_record.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (!sIsRecording && event.getAction() == MotionEvent.ACTION_DOWN) {
+                    sIsRecording = true;
+                    if (sVoiceFile.length() > 0) {
+                        deleteFile(sVoiceFile);
+                    }
+                    sVoiceHelper.startRecording(getVoiceFileName());
+                } else if (sIsRecording && (event.getAction() == MotionEvent.ACTION_UP
+                        || event.getAction() == MotionEvent.ACTION_CANCEL)) {
+                    sVoiceHelper.finishRecording();
+                    btn_play.setVisibility(View.VISIBLE);
+                    sIsRecording = false;
+                }
+                return false;
+            }
+        });
+    }
+
+    @Override
+    protected void onStop() {
+        sVoiceHelper.stop();
+
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (sDiscardNote && sVoiceFile.length() > 0) {
+            deleteFile(sVoiceFile);
+        }
+
+        super.onDestroy();
+    }
+
+    private String getVoiceFileName() {
+        sVoiceFile = System.currentTimeMillis() + ".3gpp";
+        return sVoiceFile;
+    }
+
+    public void playVoice(View v) {
+        if (sVoiceFile.length() != 0) {
+            sVoiceHelper.playVoice(sVoiceFile);
+        }
     }
 
     public void saveNote(View v) {
+        String description = ((EditText)findViewById(R.id.et_desc)).getText().toString();
+        if (sVoiceFile.length() == 0 && description.length() == 0) {
+            Toast.makeText(this, R.string.basic_info_missing, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         SQLiteDatabase db = (new DbHelper(this).getWritableDatabase());
-        Note note = new Note(0, ((EditText)findViewById(R.id.et_desc)).getText().toString(),
-                sDueDate, sVoiceFile, sCurrentPrio);
+        Note note = new Note(0, description, sDueDate, sVoiceFile, sCurrentPrio);
         ContentValues cv = new ContentValues();
 
         cv.put(Note.COL_DESC, note.description);
@@ -67,7 +129,7 @@ public class AddNoteActivity extends Activity {
         if (model != null) {
             model.addNote(note);
         }
-
+        sDiscardNote = false;
         finish();
     }
 
@@ -78,7 +140,9 @@ public class AddNoteActivity extends Activity {
 
     private String getTime(int progress) {
         String display = "";
-        if (progress > 0 && progress <= 25) {
+        if (progress == 0) {
+            sDueDate = 0;
+        } else if (progress > 0 && progress <= 25) {
             int num = (int)(progress * 1.0f / 25 * 60);
             sDueDate = System.currentTimeMillis() + num * 60 * 1000;
             display = num + " mins";
@@ -95,9 +159,7 @@ public class AddNoteActivity extends Activity {
             sDueDate = System.currentTimeMillis() + num * 30 * 24 * 60 * 60 * 1000;
             display = num + " month";
         }
-
         return display;
-
     }
 
     public void onPrioClicked(View v) {
