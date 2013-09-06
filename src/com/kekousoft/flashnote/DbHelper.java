@@ -17,10 +17,11 @@ public class DbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String create = "CREATE TABLE " + Note.TABLE_NAME + " ("
                 + Note.COL_ID + " INTEGER PRIMARY KEY, "
-                + Note.COL_PRIO + " INTEGER, "
+                + Note.COL_COLOR + " INTEGER, "
                 + Note.COL_DESC + " TEXT, "
                 + Note.COL_VOICE + " TEXT, "
-                + Note.COL_DUEDATE + " INTEGER"
+                + Note.COL_DUEDATE + " INTEGER,"
+                + Note.COL_FINISHED_ON + " INTEGER"
                 + ")";
         db.execSQL(create);
     }

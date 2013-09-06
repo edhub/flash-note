@@ -28,30 +28,29 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
     public void newNote(MenuItem mi) {
-        Intent i = new Intent(MainActivity.this, AddNoteActivity.class);
+        Intent i = new Intent(MainActivity.this, EditNoteActivity.class);
         startActivity(i);
     }
 
-    public void showUpcoming(MenuItem mi) {
-        sAdapter.changeModel(Model.UPCOMING);
+    public void showOngoing(MenuItem mi) {
+        sAdapter.changeModel(Model.ONGOING);
     }
 
-    public void showPast(MenuItem mi) {
-        sAdapter.changeModel(Model.PAST);
-    }
-
-    public void showNoDuedate(MenuItem mi) {
-        sAdapter.changeModel(Model.NO_DUEDATE);
+    public void showDone(MenuItem mi) {
+        sAdapter.changeModel(Model.DONE);
     }
 
     public void showAll(MenuItem mi) {
         sAdapter.changeModel(Model.ALL);
+    }
+
+    public void toggleEdit(MenuItem mi) {
+        sAdapter.toggleEdit();
     }
 
     @Override
@@ -62,7 +61,6 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-        Model.releaseModel();
         super.onDestroy();
     }
 }

@@ -12,23 +12,20 @@ public class Note {
 
     public static final String COL_VOICE = "voice_record";
 
-    public static final String COL_PRIO = "priority";
+    public static final String COL_COLOR = "color";
 
-    public static final int PRIO_LOW = 3;
-
-    public static final int PRIO_NORMAL = 2;
-
-    public static final int PRIO_HIGH = 1;
+    public static final String COL_FINISHED_ON = "finished_on";
 
     public Note() {
     }
 
-    public Note(long id, String description, long dueDate, String voiceRecord, int priority) {
+    public Note(long id, String description, long dueDate, String voiceRecord, int color, long finishedOn) {
         this.id = id;
         this.description = description;
         this.dueDate = dueDate;
         this.voiceRecord = voiceRecord;
-        this.priority = priority;
+        this.color = color;
+        this.finishedOn = finishedOn;
     }
 
     public long id;
@@ -39,5 +36,7 @@ public class Note {
 
     public String voiceRecord;
 
-    public int priority;
+    public int color;
+
+    public long finishedOn;
 }

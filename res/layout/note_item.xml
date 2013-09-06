@@ -1,25 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:padding="8dp" >
 
-    <Button
+    <ImageButton
         android:id="@+id/btn_play_voice"
-        android:layout_width="wrap_content"
-        android:text="@string/play"
-        android:visibility="gone"
-        android:layout_height="wrap_content" >
-    </Button>
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@null"
+        android:padding="0dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/play" />
 
-    <TextView
-        android:id="@+id/tv_desc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="5dp"
+        android:layout_weight="1"
+        android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/tv_duedate"
+        <TextView
+            android:id="@+id/tv_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#121212"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/tv_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#444444" />
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/btn_finish"
+        android:layout_width="30dp"
+        android:layout_height="match_parent"
+        android:background="@null"
+        android:padding="0dp"
+        android:scaleType="centerInside" />
+
+    <LinearLayout
+        android:id="@+id/lo_edit"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="30dp" />
+        android:layout_height="match_parent"
+        android:visibility="gone" >
+
+        <ImageButton
+            android:id="@+id/btn_edit"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@null"
+            android:padding="0dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/edit" />
+
+        <ImageButton
+            android:id="@+id/btn_delete"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:padding="0dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/trash" />
+    </LinearLayout>
 
 </LinearLayout>

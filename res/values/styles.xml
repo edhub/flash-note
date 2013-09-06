@@ -4,7 +4,7 @@
         Base application theme, dependent on API level. This theme is replaced
         by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
     -->
-    <style name="AppBaseTheme" parent="android:Theme.Light">
+    <style name="AppBaseTheme" parent="android:Theme.DeviceDefault">
         <!--
             Theme customizations available in newer API levels can go in
             res/values-vXX/styles.xml, while customizations related to
@@ -15,16 +15,6 @@
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
-    </style>
-
-    <style name="PrioButton">
-        <item name="android:layout_width">@dimen/prio_button_width</item>
-        <item name="android:layout_height">@dimen/prio_button_height</item>
-        <item name="android:layout_below">@+id/btn_record</item>
-        <item name="android:background">@color/prio_not_selected</item>
-        <item name="android:layout_marginTop">@dimen/line_space</item>
-        <item name="android:gravity">center</item>
-        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
     </style>
 
 </resources>

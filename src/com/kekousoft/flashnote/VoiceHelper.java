@@ -24,7 +24,7 @@ public class VoiceHelper {
         sFilePrefix = context.getFilesDir().getPath() + "/";
     }
 
-    public void playVoice(String voiceRecord) {
+    public void playVoice(final String voiceRecord) {
         Uri voiceUri = Uri.parse(sFilePrefix + voiceRecord);
         if (sMediaPlayer != null) {
             if (sMediaPlayer.isPlaying()) {
@@ -38,7 +38,6 @@ public class VoiceHelper {
             sMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             sMediaPlayer.setDataSource(sContext, voiceUri);
             sMediaPlayer.prepare();
-            sMediaPlayer.start();
             sMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
@@ -46,6 +45,7 @@ public class VoiceHelper {
                     sMediaPlayer = null;
                 }
             });
+            sMediaPlayer.start();
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         } catch (SecurityException e) {
@@ -57,9 +57,11 @@ public class VoiceHelper {
         }
     }
 
-    public void startRecording(String fileName) {
-        stop(); // stop any other action before a recording.
-        sRecorder = new MediaRecorder();
+    public void startRecording(final String fileName) {
+        stopPlaying();
+        if (sRecorder == null) {
+            sRecorder = new MediaRecorder();
+        }
         sRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         sRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
         sRecorder.setOutputFile(sFilePrefix + fileName);
@@ -72,13 +74,13 @@ public class VoiceHelper {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
     public void finishRecording() {
         if (sRecorder != null) {
             sRecorder.stop();
-            sRecorder.release();
-            sRecorder = null;
+            sRecorder.reset();
         }
     }
 

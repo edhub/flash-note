@@ -1,29 +1,29 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
+        android:id="@+id/act_edit"
+        android:onClick="toggleEdit"
+        android:orderInCategory="100"
+        android:showAsAction="always"
+        android:title="@string/edit"/>
+    <item
         android:id="@+id/act_new"
         android:onClick="newNote"
         android:orderInCategory="100"
         android:showAsAction="always"
         android:title="@string/add_note"/>
     <item
-        android:id="@+id/act_upcoming"
-        android:onClick="showUpcoming"
+        android:id="@+id/act_ongoing"
+        android:onClick="showOngoing"
         android:orderInCategory="100"
         android:showAsAction="never"
-        android:title="@string/upcoming"/>
+        android:title="@string/ongoing"/>
     <item
         android:id="@+id/act_past"
-        android:onClick="showPast"
+        android:onClick="showDone"
         android:orderInCategory="200"
         android:showAsAction="never"
-        android:title="@string/past"/>
-    <item
-        android:id="@+id/act_no_duedate"
-        android:onClick="showNoDuedate"
-        android:orderInCategory="200"
-        android:showAsAction="never"
-        android:title="@string/no_duedate"/>
+        android:title="@string/done"/>
     <item
         android:id="@+id/act_all"
         android:onClick="showAll"

@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="prio_selected">#8888FF</color>
-    <color name="prio_not_selected">#888888</color>
+    <color name="activity_bg">#F5F5DC</color>
+
+    <string-array name="colors">
+        <item>#00BFFF</item>
+        <item>#FF7300</item>
+        <item>#D94DFF</item>
+        <item>#5E86C1</item>
+    </string-array>
 
 </resources>

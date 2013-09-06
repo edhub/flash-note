@@ -2,21 +2,16 @@
 <resources>
 
     <string name="app_name">FlashNote</string>
-    <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="prio_low">Low</string>
-    <string name="prio_normal">Normal</string>
-    <string name="prio_high">High</string>
+    <string name="edit">Edit</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
-    <string name="press_to_record">Press to Record</string>
-    <string name="play">Play</string>
     <string name="description">Description</string>
     <string name="add_note">New</string>
     <string name="basic_info_missing">Please record a voice or enter some description!</string>
-    <string name="upcoming">Upcoming</string>
-    <string name="past">Past</string>
-    <string name="no_duedate">No Duedate</string>
+    <string name="ongoing">Ongoing</string>
+    <string name="done">Done</string>
     <string name="all">All</string>
+    <string name="confirm_delete">Sure to delete: </string>
+    <string name="finished_on">Finished on: </string>
 
 </resources>

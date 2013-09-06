@@ -2,43 +2,54 @@
 package com.kekousoft.flashnote;
 
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.res.Resources;
-import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class AddNoteActivity extends Activity {
-
-    private int sCurrentPrio = Note.PRIO_NORMAL;
+public class EditNoteActivity extends Activity {
 
     private long sDueDate;
 
     private boolean sDiscardNote = true;
 
-    private boolean sIsRecording = false;
+    private long sRecordStart;
+
+    private int[] sColors;
+
+    private int sColorIndex = 0;
+
+    private Handler sHandler;
 
     private String sVoiceFile = "";
 
     private VoiceHelper sVoiceHelper;
 
-    private int sBgSelected;
-
-    private int sBgNotSeleted;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_note);
+        setContentView(R.layout.activity_edit_note);
         Resources res = getResources();
-        sBgSelected = res.getColor(R.color.prio_selected);
-        sBgNotSeleted = res.getColor(R.color.prio_not_selected);
+        String[] colors = res.getStringArray(R.array.colors);
+        sColors = new int[colors.length];
+        for (int i = 0; i < colors.length; i++) {
+            sColors[i] = Color.parseColor(colors[i]);
+        }
+
+        sHandler = new Handler();
+
+        View v_prio = findViewById(R.id.v_prio);
+        v_prio.setBackgroundColor(nextColor());
+
+        View lo_desc = findViewById(R.id.lo_desc);
+        lo_desc.setBackgroundColor(getColor());
 
         final TextView tv_date = (TextView)findViewById(R.id.tv_date);
         SeekBar sb_date = (SeekBar)findViewById(R.id.sb_date);
@@ -58,32 +69,55 @@ public class AddNoteActivity extends Activity {
         });
 
         sVoiceHelper = new VoiceHelper(this);
-        final Button btn_play = (Button)findViewById(R.id.btn_play);
-        final Button btn_record = (Button)findViewById(R.id.btn_record);
+        final ImageButton btn_record = (ImageButton)findViewById(R.id.btn_record);
         btn_record.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (!sIsRecording && event.getAction() == MotionEvent.ACTION_DOWN) {
-                    sIsRecording = true;
+                if (sRecordStart == 0 && event.getAction() == MotionEvent.ACTION_DOWN) {
+                    sRecordStart = System.currentTimeMillis();
                     if (sVoiceFile.length() > 0) {
                         deleteFile(sVoiceFile);
                     }
                     sVoiceHelper.startRecording(getVoiceFileName());
-                } else if (sIsRecording && (event.getAction() == MotionEvent.ACTION_UP
+                } else if (sRecordStart > 0 && (event.getAction() == MotionEvent.ACTION_UP
                         || event.getAction() == MotionEvent.ACTION_CANCEL)) {
-                    sVoiceHelper.finishRecording();
-                    btn_play.setVisibility(View.VISIBLE);
-                    sIsRecording = false;
+                    stopRecordingSafely();
                 }
                 return false;
             }
         });
     }
 
+    private void stopRecordingSafely() {
+        if (sRecordStart > 0) {
+            long timeSpan = System.currentTimeMillis() - sRecordStart;
+            final ImageButton btn_play = (ImageButton)findViewById(R.id.btn_play);
+            // delete voice file if the recording is less than 0.5 second.
+            if (timeSpan < 500) {
+                final ImageButton btn_record = (ImageButton)findViewById(R.id.btn_record);
+                btn_record.setEnabled(false);
+                Toast.makeText(this, "Too short", Toast.LENGTH_SHORT).show();
+                sHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        sVoiceHelper.finishRecording();
+                        deleteFile(sVoiceFile);
+                        sVoiceFile = "";
+                        btn_play.setVisibility(View.GONE);
+                        btn_record.setEnabled(true);
+                    }
+                }, 300 - timeSpan);
+            } else {
+                sVoiceHelper.finishRecording();
+                btn_play.setVisibility(View.VISIBLE);
+            }
+            sRecordStart = 0;
+        }
+    }
+
     @Override
     protected void onStop() {
-        sVoiceHelper.stop();
-
+        stopRecordingSafely();
         super.onStop();
     }
 
@@ -92,7 +126,6 @@ public class AddNoteActivity extends Activity {
         if (sDiscardNote && sVoiceFile.length() > 0) {
             deleteFile(sVoiceFile);
         }
-
         super.onDestroy();
     }
 
@@ -107,34 +140,35 @@ public class AddNoteActivity extends Activity {
         }
     }
 
+    public void togglePrio(View v) {
+        sColorIndex = (sColorIndex + 1) % sColors.length;
+        View lo_desc = findViewById(R.id.lo_desc);
+        lo_desc.setBackgroundColor(getColor());
+        v.setBackgroundColor(nextColor());
+    }
+
+    private int nextColor() {
+        int next = (sColorIndex + 1) % sColors.length;
+        return sColors[next];
+    }
+
+    private int getColor() {
+        return sColors[sColorIndex];
+    }
+
     public void saveNote(View v) {
         String description = ((EditText)findViewById(R.id.et_desc)).getText().toString();
         if (sVoiceFile.length() == 0 && description.length() == 0) {
             Toast.makeText(this, R.string.basic_info_missing, Toast.LENGTH_SHORT).show();
             return;
         }
-
-        SQLiteDatabase db = (new DbHelper(this).getWritableDatabase());
-        Note note = new Note(0, description, sDueDate, sVoiceFile, sCurrentPrio);
-        ContentValues cv = new ContentValues();
-
-        cv.put(Note.COL_DESC, note.description);
-        cv.put(Note.COL_DUEDATE, note.dueDate);
-        cv.put(Note.COL_PRIO, note.priority);
-        cv.put(Note.COL_VOICE, note.voiceRecord);
-        note.id = db.insert(Note.TABLE_NAME, null, cv);
-        db.close();
-
-        Model model = Model.getModel(this, false);
-        if (model != null) {
-            model.addNote(note);
-        }
+        Note note = new Note(0, description, sDueDate, sVoiceFile, getColor(), 0);
+        Model.insertNote(this, note);
         sDiscardNote = false;
         finish();
     }
 
     public void cancelEdit(View v) {
-        // destroy recorded voice, etc
         finish();
     }
 
@@ -162,41 +196,4 @@ public class AddNoteActivity extends Activity {
         return display;
     }
 
-    public void onPrioClicked(View v) {
-
-        int prio = getPrio(v.getId());
-        if (prio != sCurrentPrio) {
-            unSelectPrio(sCurrentPrio);
-            sCurrentPrio = prio;
-            v.setBackgroundColor(sBgSelected);
-        }
-    }
-
-    private int getPrio(int id) {
-        switch (id) {
-            case R.id.tv_prio_low:
-                return Note.PRIO_LOW;
-            case R.id.tv_prio_high:
-                return Note.PRIO_HIGH;
-            default:
-                return Note.PRIO_NORMAL;
-        }
-    }
-
-    private void unSelectPrio(int prio) {
-        int id;
-        switch (prio) {
-            case Note.PRIO_LOW:
-                id = R.id.tv_prio_low;
-                break;
-            case Note.PRIO_HIGH:
-                id = R.id.tv_prio_high;
-                break;
-            default:
-                id = R.id.tv_prio_normal;
-                break;
-        }
-        View v = findViewById(id);
-        v.setBackgroundColor(sBgNotSeleted);
-    }
 }
