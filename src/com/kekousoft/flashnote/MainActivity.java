@@ -1,6 +1,8 @@
 
 package com.kekousoft.flashnote;
 
+import com.kekousoft.flashnote.AlarmMaker.AlarmReceiver;
+
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
@@ -14,13 +16,21 @@ public class MainActivity extends Activity {
 
     private NoteAdapter mAdapter;
 
+    private Controller mController;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         mVoiceHelper = new VoiceHelper(this);
-        mAdapter = new NoteAdapter(this, Model.getModel(this, true), mVoiceHelper);
+        mController = Controller.getInstance(this, true);
+        mAdapter = new NoteAdapter(this, mController, mVoiceHelper);
+        mController.registerObserver(mAdapter);
+
+        Intent i = new Intent(this, AlarmReceiver.class);
+        i.putExtra(AlarmMaker.SETUP_ALARM, "");
+        startService(i);
 
         ListView lv_notes = (ListView)findViewById(R.id.lv_notes);
         lv_notes.setAdapter(mAdapter);
@@ -38,15 +48,15 @@ public class MainActivity extends Activity {
     }
 
     public void showOngoing(MenuItem mi) {
-        mAdapter.changeModel(Model.ONGOING);
+        mAdapter.changeModel(Controller.MODEL_ONGOING);
     }
 
     public void showDone(MenuItem mi) {
-        mAdapter.changeModel(Model.DONE);
+        mAdapter.changeModel(Controller.MODEL_DONE);
     }
 
     public void showAll(MenuItem mi) {
-        mAdapter.changeModel(Model.ALL);
+        mAdapter.changeModel(Controller.MODEL_ALL);
     }
 
     public void toggleEdit(MenuItem mi) {
@@ -61,6 +71,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        mController.unRegisterObserver(mAdapter);
         super.onDestroy();
     }
 }

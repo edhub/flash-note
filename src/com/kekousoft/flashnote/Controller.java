@@ -10,15 +10,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-public class Model {
+public class Controller {
 
-    public static final int ALL = 1;
+    public static final int MODEL_ALL = 1;
 
-    public static final int DONE = 2;
+    public static final int MODEL_DONE = 2;
 
-    public static final int ONGOING = 3;
+    public static final int MODEL_ONGOING = 3;
 
-    private static Model sModel;
+    private static Controller sController;
 
     private static Comparator<Note> sCompDueDateDesc = new Comparator<Note>() {
         @Override
@@ -30,6 +30,11 @@ public class Model {
     private static Comparator<Note> sCompDueDateAsc = new Comparator<Note>() {
         @Override
         public int compare(Note lhs, Note rhs) {
+            if (lhs.dueDate == 0) {
+                return Integer.MAX_VALUE;
+            } else if (rhs.dueDate == 0) {
+                return Integer.MIN_VALUE;
+            }
             return (int)(lhs.dueDate - rhs.dueDate);
         }
     };
@@ -37,6 +42,11 @@ public class Model {
     private static Comparator<Note> sCompFinishDesc = new Comparator<Note>() {
         @Override
         public int compare(Note lhs, Note rhs) {
+            if (lhs.dueDate == 0) {
+                return Integer.MAX_VALUE;
+            } else if (rhs.dueDate == 0) {
+                return Integer.MIN_VALUE;
+            }
             return (int)(rhs.finishedOn - lhs.finishedOn);
         }
     };
@@ -47,9 +57,9 @@ public class Model {
 
     private ArrayList<Note> mOngoingNotes;
 
-    private ArrayList<DataChangeObserver> mObservers = new ArrayList<Model.DataChangeObserver>();
+    private ArrayList<DataChangeObserver> mObservers = new ArrayList<Controller.DataChangeObserver>();
 
-    private Model(ArrayList<Note> all) {
+    private Controller(ArrayList<Note> all) {
         mAllNotes = all;
 
         mDoneNotes = new ArrayList<Note>();
@@ -67,9 +77,10 @@ public class Model {
             }
         }
         Collections.sort(mOngoingNotes, sCompDueDateAsc);
+
     }
 
-    private static Model createModel(Context context) {
+    private static Controller createController(Context context) {
         SQLiteDatabase db = (new DbHelper(context)).getReadableDatabase();
         Cursor c = db.query(Note.TABLE_NAME, null, null, null, null, null,
                 Note.COL_DUEDATE + " desc");
@@ -87,25 +98,27 @@ public class Model {
         }
         c.close();
         db.close();
-        return new Model(notes);
+
+        return new Controller(notes);
     }
 
-    public static Model getModel(Context context, boolean createIfNotExist) {
-        if (sModel == null && createIfNotExist) {
-            sModel = createModel(context);
+    public static Controller getInstance(Context context, boolean createIfNotExist) {
+        if (sController == null && createIfNotExist) {
+            sController = createController(context);
+            sController.registerObserver(new AlarmMaker(context.getApplicationContext()));
         }
-        return sModel;
+        return sController;
     }
 
     public static void releaseModel() {
-        sModel = null;
+        sController = null;
     }
 
-    public ArrayList<Note> getNotes(int which) {
+    public ArrayList<Note> getModel(int which) {
         switch (which) {
-            case ALL:
+            case MODEL_ALL:
                 return mAllNotes;
-            case DONE:
+            case MODEL_DONE:
                 return mDoneNotes;
             default:
                 return mOngoingNotes;
@@ -127,8 +140,8 @@ public class Model {
 
     public static Note getNoteById(Context context, long id) {
         Note note = null;
-        if (sModel != null) {
-            note = sModel.getNote(id);
+        if (sController != null) {
+            note = sController.getNote(id);
         }
 
         if (note == null) {
@@ -170,8 +183,8 @@ public class Model {
         note.id = db.insert(Note.TABLE_NAME, null, cv);
         db.close();
 
-        if (sModel != null) {
-            sModel.newNote(note);
+        if (sController != null) {
+            sController.newNote(note);
         }
     }
 
@@ -189,8 +202,8 @@ public class Model {
 
     public static void updateNote(Context context, Note note) {
         updateNoteDb(context, note);
-        if (sModel != null) {
-            sModel.onNoteUpdated(note);
+        if (sController != null) {
+            sController.onNoteUpdated(note);
         }
     }
 
@@ -248,6 +261,10 @@ public class Model {
 
     public void registerObserver(DataChangeObserver observer) {
         mObservers.add(observer);
+    }
+
+    public void unRegisterObserver(DataChangeObserver observer) {
+        mObservers.remove(observer);
     }
 
     public static interface DataChangeObserver {

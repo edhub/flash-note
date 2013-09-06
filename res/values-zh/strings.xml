@@ -13,5 +13,6 @@
     <string name="all">全部</string>
     <string name="confirm_delete">确认删除：</string>
     <string name="finished_on">（完成于：%1$s）</string>
+    <string name="notification_title">事件提醒：</string>
 
 </resources>

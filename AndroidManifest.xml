@@ -24,6 +24,7 @@
             </intent-filter>
         </activity>
         <activity android:screenOrientation="portrait" android:name="EditNoteActivity"></activity>
+        <receiver android:name="AlarmMaker$AlarmReceiver"></receiver>
     </application>
 
 </manifest>

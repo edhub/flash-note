@@ -55,7 +55,7 @@ public class EditNoteActivity extends Activity {
 
         long id = getIntent().getLongExtra(NOTE_ID, 0);
         if (id > 0) {
-            mNote = Model.getNoteById(this, id);
+            mNote = Controller.getNoteById(this, id);
         }
 
         // Init data for edit mode
@@ -207,11 +207,12 @@ public class EditNoteActivity extends Activity {
                 mNote.voiceRecord = mVoiceFile;
             }
             mNote.color = getColor();
-            Model.updateNote(this, mNote);
+            Controller.updateNote(this, mNote);
         } else {
             mNote = new Note(0, description, mDueDate, mVoiceFile, getColor(), 0);
-            Model.insertNote(this, mNote);
+            Controller.insertNote(this, mNote);
         }
+
         mDiscardVoice = false;
         finish();
     }

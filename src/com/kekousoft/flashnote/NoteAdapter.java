@@ -16,31 +16,30 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class NoteAdapter extends BaseAdapter implements Model.DataChangeObserver {
+public class NoteAdapter extends BaseAdapter implements Controller.DataChangeObserver {
 
-    private ArrayList<Note> mNotes;
+    private ArrayList<Note> mModel;
 
     private LayoutInflater mInflater;
 
     private boolean mEdit = false;
 
-    private Model mModel;
+    private Controller mController;
 
     private VoiceHelper mVoiceHelper;
 
     private Context mContext;
 
-    public NoteAdapter(Context context, Model model, VoiceHelper voiceHelper) {
+    public NoteAdapter(Context context, Controller model, VoiceHelper voiceHelper) {
         mContext = context;
         mVoiceHelper = voiceHelper;
         mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        mModel = model;
-        mNotes = mModel.getNotes(Model.ONGOING);
-        model.registerObserver(this);
+        mController = model;
+        mModel = mController.getModel(Controller.MODEL_ONGOING);
     }
 
     public void changeModel(int which) {
-        mNotes = mModel.getNotes(which);
+        mModel = mController.getModel(which);
         notifyDataSetChanged();
     }
 
@@ -51,17 +50,17 @@ public class NoteAdapter extends BaseAdapter implements Model.DataChangeObserver
 
     @Override
     public int getCount() {
-        return mNotes.size();
+        return mModel.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return mNotes.get(position);
+        return mModel.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        return mNotes.get(position).id;
+        return mModel.get(position).id;
     }
 
     @Override
@@ -72,7 +71,7 @@ public class NoteAdapter extends BaseAdapter implements Model.DataChangeObserver
         } else {
             view = mInflater.inflate(R.layout.note_item, null);
         }
-        final Note note = mNotes.get(position);
+        final Note note = mModel.get(position);
 
         view.setBackgroundColor(note.color);
 
@@ -110,7 +109,7 @@ public class NoteAdapter extends BaseAdapter implements Model.DataChangeObserver
             btn_finish.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mModel.finishNote(mContext, note);
+                    mController.finishNote(mContext, note);
                 }
             });
         } else {
@@ -118,7 +117,7 @@ public class NoteAdapter extends BaseAdapter implements Model.DataChangeObserver
             btn_finish.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mModel.reOpenNote(mContext, note);
+                    mController.reOpenNote(mContext, note);
                 }
             });
         }
@@ -148,15 +147,13 @@ public class NoteAdapter extends BaseAdapter implements Model.DataChangeObserver
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    mModel.deleteNote(mContext, note);
+                                    mController.deleteNote(mContext, note);
                                 }
                             });
                     alert.setNegativeButton(android.R.string.cancel, null);
                     alert.show();
-
                 }
             });
-
         } else {
             lo_edit.setVisibility(View.GONE);
         }
@@ -168,5 +165,4 @@ public class NoteAdapter extends BaseAdapter implements Model.DataChangeObserver
     public void notifyModelChanged() {
         notifyDataSetChanged();
     }
-
 }
