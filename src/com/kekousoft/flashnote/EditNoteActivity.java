@@ -6,6 +6,7 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.format.DateUtils;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
@@ -16,42 +17,72 @@ import android.widget.Toast;
 
 public class EditNoteActivity extends Activity {
 
-    private long sDueDate;
+    public static final String NOTE_ID = "com.kekousoft.flashnote.NOTEID";
 
-    private boolean sDiscardNote = true;
+    private long mDueDate;
 
-    private long sRecordStart;
+    private boolean mDiscardVoice = true;
 
-    private int[] sColors;
+    private long mRecordStart;
 
-    private int sColorIndex = 0;
+    private int[] mColors;
 
-    private Handler sHandler;
+    private int mColorIndex = 0;
 
-    private String sVoiceFile = "";
+    private Note mNote;
 
-    private VoiceHelper sVoiceHelper;
+    private Handler mHandler;
+
+    private String mVoiceFile = "";
+
+    private VoiceHelper mVoiceHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_note);
         Resources res = getResources();
+        mHandler = new Handler();
+
         String[] colors = res.getStringArray(R.array.colors);
-        sColors = new int[colors.length];
+        mColors = new int[colors.length];
         for (int i = 0; i < colors.length; i++) {
-            sColors[i] = Color.parseColor(colors[i]);
+            mColors[i] = Color.parseColor(colors[i]);
         }
 
-        sHandler = new Handler();
+        final TextView tv_date = (TextView)findViewById(R.id.tv_date);
+        final ImageButton btn_record = (ImageButton)findViewById(R.id.btn_record);
+
+        long id = getIntent().getLongExtra(NOTE_ID, 0);
+        if (id > 0) {
+            mNote = Model.getNoteById(this, id);
+        }
+
+        // Init data for edit mode
+        if (mNote != null) {
+            for (int i = 0; i < mColors.length; i++) {
+                if (mNote.color == mColors[i]) {
+                    mColorIndex = i;
+                    break;
+                }
+            }
+            if (mNote.voiceRecord.length() > 0) {
+                ImageButton btn_play_orig = (ImageButton)findViewById(R.id.btn_play_orig);
+                btn_play_orig.setVisibility(View.VISIBLE);
+            }
+            if (mNote.dueDate > System.currentTimeMillis()) {
+                tv_date.setText(DateUtils.getRelativeTimeSpanString(mNote.dueDate));
+            }
+            if (mNote.description.length() > 0) {
+                ((EditText)findViewById(R.id.et_desc)).setText(mNote.description);
+            }
+        }
 
         View v_prio = findViewById(R.id.v_prio);
         v_prio.setBackgroundColor(nextColor());
-
         View lo_desc = findViewById(R.id.lo_desc);
         lo_desc.setBackgroundColor(getColor());
 
-        final TextView tv_date = (TextView)findViewById(R.id.tv_date);
         SeekBar sb_date = (SeekBar)findViewById(R.id.sb_date);
         sb_date.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -68,18 +99,17 @@ public class EditNoteActivity extends Activity {
             }
         });
 
-        sVoiceHelper = new VoiceHelper(this);
-        final ImageButton btn_record = (ImageButton)findViewById(R.id.btn_record);
+        mVoiceHelper = new VoiceHelper(this);
         btn_record.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (sRecordStart == 0 && event.getAction() == MotionEvent.ACTION_DOWN) {
-                    sRecordStart = System.currentTimeMillis();
-                    if (sVoiceFile.length() > 0) {
-                        deleteFile(sVoiceFile);
+                if (mRecordStart == 0 && event.getAction() == MotionEvent.ACTION_DOWN) {
+                    mRecordStart = System.currentTimeMillis();
+                    if (mVoiceFile.length() > 0) {
+                        deleteFile(mVoiceFile);
                     }
-                    sVoiceHelper.startRecording(getVoiceFileName());
-                } else if (sRecordStart > 0 && (event.getAction() == MotionEvent.ACTION_UP
+                    mVoiceHelper.startRecording(getVoiceFileName());
+                } else if (mRecordStart > 0 && (event.getAction() == MotionEvent.ACTION_UP
                         || event.getAction() == MotionEvent.ACTION_CANCEL)) {
                     stopRecordingSafely();
                 }
@@ -89,29 +119,29 @@ public class EditNoteActivity extends Activity {
     }
 
     private void stopRecordingSafely() {
-        if (sRecordStart > 0) {
-            long timeSpan = System.currentTimeMillis() - sRecordStart;
+        if (mRecordStart > 0) {
+            long timeSpan = System.currentTimeMillis() - mRecordStart;
             final ImageButton btn_play = (ImageButton)findViewById(R.id.btn_play);
-            // delete voice file if the recording is less than 0.5 second.
-            if (timeSpan < 500) {
+            // delete voice file if the recording is less than 0.4 second.
+            if (timeSpan < 400) {
                 final ImageButton btn_record = (ImageButton)findViewById(R.id.btn_record);
                 btn_record.setEnabled(false);
                 Toast.makeText(this, "Too short", Toast.LENGTH_SHORT).show();
-                sHandler.postDelayed(new Runnable() {
+                mHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        sVoiceHelper.finishRecording();
-                        deleteFile(sVoiceFile);
-                        sVoiceFile = "";
+                        mVoiceHelper.finishRecording();
+                        deleteFile(mVoiceFile);
+                        mVoiceFile = "";
                         btn_play.setVisibility(View.GONE);
                         btn_record.setEnabled(true);
                     }
                 }, 300 - timeSpan);
             } else {
-                sVoiceHelper.finishRecording();
+                mVoiceHelper.finishRecording();
                 btn_play.setVisibility(View.VISIBLE);
             }
-            sRecordStart = 0;
+            mRecordStart = 0;
         }
     }
 
@@ -123,48 +153,66 @@ public class EditNoteActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-        if (sDiscardNote && sVoiceFile.length() > 0) {
-            deleteFile(sVoiceFile);
+        if (mDiscardVoice && mVoiceFile.length() > 0) {
+            deleteFile(mVoiceFile);
         }
         super.onDestroy();
     }
 
     private String getVoiceFileName() {
-        sVoiceFile = System.currentTimeMillis() + ".3gpp";
-        return sVoiceFile;
+        mVoiceFile = System.currentTimeMillis() + ".3gpp";
+        return mVoiceFile;
     }
 
     public void playVoice(View v) {
-        if (sVoiceFile.length() != 0) {
-            sVoiceHelper.playVoice(sVoiceFile);
+        if (mVoiceFile.length() != 0) {
+            mVoiceHelper.playVoice(mVoiceFile);
         }
     }
 
+    public void playVoiceOrig(View v) {
+        mVoiceHelper.playVoice(mNote.voiceRecord);
+    }
+
     public void togglePrio(View v) {
-        sColorIndex = (sColorIndex + 1) % sColors.length;
+        mColorIndex = (mColorIndex + 1) % mColors.length;
         View lo_desc = findViewById(R.id.lo_desc);
         lo_desc.setBackgroundColor(getColor());
         v.setBackgroundColor(nextColor());
     }
 
     private int nextColor() {
-        int next = (sColorIndex + 1) % sColors.length;
-        return sColors[next];
+        int next = (mColorIndex + 1) % mColors.length;
+        return mColors[next];
     }
 
     private int getColor() {
-        return sColors[sColorIndex];
+        return mColors[mColorIndex];
     }
 
     public void saveNote(View v) {
         String description = ((EditText)findViewById(R.id.et_desc)).getText().toString();
-        if (sVoiceFile.length() == 0 && description.length() == 0) {
+        if (mNote == null && mVoiceFile.length() == 0 && description.length() == 0) {
             Toast.makeText(this, R.string.basic_info_missing, Toast.LENGTH_SHORT).show();
             return;
         }
-        Note note = new Note(0, description, sDueDate, sVoiceFile, getColor(), 0);
-        Model.insertNote(this, note);
-        sDiscardNote = false;
+
+        if (mNote != null) {
+            mNote.description = description;
+            if (mDueDate > 0) {
+                mNote.dueDate = mDueDate;
+            }
+            if (mVoiceFile.length() > 0) {
+                deleteFile(mNote.voiceRecord);
+                mNote.voiceRecord = mVoiceFile;
+            }
+            mNote.color = getColor();
+            Model.updateNote(this, mNote);
+        } else {
+            mNote = new Note(0, description, mDueDate, mVoiceFile, getColor(), 0);
+            Model.insertNote(this, mNote);
+        }
+        mDiscardVoice = false;
         finish();
     }
 
@@ -173,27 +221,25 @@ public class EditNoteActivity extends Activity {
     }
 
     private String getTime(int progress) {
-        String display = "";
         if (progress == 0) {
-            sDueDate = 0;
+            mDueDate = 0;
         } else if (progress > 0 && progress <= 25) {
-            int num = (int)(progress * 1.0f / 25 * 60);
-            sDueDate = System.currentTimeMillis() + num * 60 * 1000;
-            display = num + " mins";
+            float num = progress * 1.0f / 25 * 60;
+            mDueDate = (long)(System.currentTimeMillis() + num * 60 * 1000);
         } else if (progress > 25 && progress <= 50) {
-            int num = (int)((progress - 24) * 1.0f / 25 * 24);
-            sDueDate = System.currentTimeMillis() + num * 60 * 60 * 1000;
-            display = num + " hours";
+            float num = (progress - 24) * 1.0f / 25 * 24;
+            mDueDate = (long)(System.currentTimeMillis() + num * 60 * 60 * 1000);
         } else if (progress > 50 && progress <= 75) {
-            int num = (int)((progress - 50) * 1.0f / 25 * 30);
-            sDueDate = System.currentTimeMillis() + num * 24 * 60 * 60 * 1000;
-            display = num + " days";
+            float num = (progress - 50) * 1.0f / 25 * 30;
+            mDueDate = (long)(System.currentTimeMillis() + num * 24 * 60 * 60 * 1000);
         } else if (progress > 75) {
-            int num = (int)((progress - 74) * 1.0f / 2);
-            sDueDate = System.currentTimeMillis() + num * 30 * 24 * 60 * 60 * 1000;
-            display = num + " month";
+            float num = (progress - 74) * 1.0f / 2;
+            mDueDate = (long)(System.currentTimeMillis() + num * 30 * 24 * 60 * 60 * 1000);
         }
-        return display;
+        if (mDueDate == 0) {
+            return "";
+        }
+        return DateUtils.getRelativeTimeSpanString(mDueDate).toString();
     }
 
 }

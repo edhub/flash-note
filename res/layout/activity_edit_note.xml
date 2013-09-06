@@ -21,9 +21,22 @@
             android:src="@drawable/recording" />
 
         <ImageButton
+            android:id="@+id/btn_play_orig"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignTop="@+id/btn_record"
+            android:layout_marginLeft="20dp"
+            android:layout_toRightOf="@+id/btn_record"
+            android:background="@null"
+            android:onClick="playVoiceOrig"
+            android:scaleType="centerInside"
+            android:src="@drawable/play"
+            android:visibility="gone" />
+
+        <ImageButton
             android:id="@+id/btn_play"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:layout_alignBottom="@+id/btn_record"
             android:layout_marginLeft="20dp"
             android:layout_toRightOf="@+id/btn_record"

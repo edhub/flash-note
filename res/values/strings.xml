@@ -12,6 +12,6 @@
     <string name="done">Done</string>
     <string name="all">All</string>
     <string name="confirm_delete">Sure to delete: </string>
-    <string name="finished_on">Finished on: </string>
+    <string name="finished_on">(Finished on: %1$s)</string>
 
 </resources>

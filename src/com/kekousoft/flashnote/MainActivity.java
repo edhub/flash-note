@@ -10,20 +10,20 @@ import android.widget.ListView;
 
 public class MainActivity extends Activity {
 
-    private VoiceHelper sVoiceHelper;
+    private VoiceHelper mVoiceHelper;
 
-    private NoteAdapter sAdapter;
+    private NoteAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        sVoiceHelper = new VoiceHelper(this);
-        sAdapter = new NoteAdapter(this, Model.getModel(this, true), sVoiceHelper);
+        mVoiceHelper = new VoiceHelper(this);
+        mAdapter = new NoteAdapter(this, Model.getModel(this, true), mVoiceHelper);
 
         ListView lv_notes = (ListView)findViewById(R.id.lv_notes);
-        lv_notes.setAdapter(sAdapter);
+        lv_notes.setAdapter(mAdapter);
     }
 
     @Override
@@ -38,24 +38,24 @@ public class MainActivity extends Activity {
     }
 
     public void showOngoing(MenuItem mi) {
-        sAdapter.changeModel(Model.ONGOING);
+        mAdapter.changeModel(Model.ONGOING);
     }
 
     public void showDone(MenuItem mi) {
-        sAdapter.changeModel(Model.DONE);
+        mAdapter.changeModel(Model.DONE);
     }
 
     public void showAll(MenuItem mi) {
-        sAdapter.changeModel(Model.ALL);
+        mAdapter.changeModel(Model.ALL);
     }
 
     public void toggleEdit(MenuItem mi) {
-        sAdapter.toggleEdit();
+        mAdapter.toggleEdit();
     }
 
     @Override
     protected void onStop() {
-        sVoiceHelper.stop();
+        mVoiceHelper.stop();
         super.onStop();
     }
 

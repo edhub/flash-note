@@ -18,50 +18,50 @@ import java.util.ArrayList;
 
 public class NoteAdapter extends BaseAdapter implements Model.DataChangeObserver {
 
-    private ArrayList<Note> sNotes;
+    private ArrayList<Note> mNotes;
 
-    private LayoutInflater sInflater;
+    private LayoutInflater mInflater;
 
-    private boolean sEdit = false;
+    private boolean mEdit = false;
 
-    private Model sModel;
+    private Model mModel;
 
-    private VoiceHelper sVoiceHelper;
+    private VoiceHelper mVoiceHelper;
 
-    private Context sContext;
+    private Context mContext;
 
     public NoteAdapter(Context context, Model model, VoiceHelper voiceHelper) {
-        sContext = context;
-        sVoiceHelper = voiceHelper;
-        sInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        sModel = model;
-        sNotes = sModel.getNotes(Model.ONGOING);
+        mContext = context;
+        mVoiceHelper = voiceHelper;
+        mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mModel = model;
+        mNotes = mModel.getNotes(Model.ONGOING);
         model.registerObserver(this);
     }
 
     public void changeModel(int which) {
-        sNotes = sModel.getNotes(which);
+        mNotes = mModel.getNotes(which);
         notifyDataSetChanged();
     }
 
     public void toggleEdit() {
-        sEdit = !sEdit;
+        mEdit = !mEdit;
         notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return sNotes.size();
+        return mNotes.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return sNotes.get(position);
+        return mNotes.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        return sNotes.get(position).id;
+        return mNotes.get(position).id;
     }
 
     @Override
@@ -70,9 +70,9 @@ public class NoteAdapter extends BaseAdapter implements Model.DataChangeObserver
         if (convertView != null) {
             view = convertView;
         } else {
-            view = sInflater.inflate(R.layout.note_item, null);
+            view = mInflater.inflate(R.layout.note_item, null);
         }
-        final Note note = sNotes.get(position);
+        final Note note = mNotes.get(position);
 
         view.setBackgroundColor(note.color);
 
@@ -80,11 +80,13 @@ public class NoteAdapter extends BaseAdapter implements Model.DataChangeObserver
         tv_desc.setText(note.description);
 
         TextView tv_date = (TextView)view.findViewById(R.id.tv_date);
-        if (note.finishedOn > 0) {
-            tv_date.setText(sContext.getString(R.string.finished_on)
-                    + DateUtils.getRelativeTimeSpanString(note.finishedOn));
-        } else if (note.dueDate > 0) {
-            tv_date.setText(DateUtils.getRelativeTimeSpanString(note.dueDate));
+        if (note.dueDate > 0) {
+            String dateStr = DateUtils.getRelativeTimeSpanString(note.dueDate).toString();
+            if (note.finishedOn > 0) {
+                dateStr += String.format(mContext.getString(R.string.finished_on),
+                        DateUtils.getRelativeTimeSpanString(note.finishedOn));
+            }
+            tv_date.setText(dateStr);
         } else {
             tv_date.setText("");
         }
@@ -95,7 +97,7 @@ public class NoteAdapter extends BaseAdapter implements Model.DataChangeObserver
             btn_play_voice.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    sVoiceHelper.playVoice(note.voiceRecord);
+                    mVoiceHelper.playVoice(note.voiceRecord);
                 }
             });
         } else {
@@ -108,7 +110,7 @@ public class NoteAdapter extends BaseAdapter implements Model.DataChangeObserver
             btn_finish.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    sModel.finishNote(sContext, note);
+                    mModel.finishNote(mContext, note);
                 }
             });
         } else {
@@ -116,22 +118,22 @@ public class NoteAdapter extends BaseAdapter implements Model.DataChangeObserver
             btn_finish.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    sModel.reOpenNote(sContext, note);
+                    mModel.reOpenNote(mContext, note);
                 }
             });
         }
 
         View lo_edit = view.findViewById(R.id.lo_edit);
         lo_edit.setTag(note.id);
-        if (sEdit) {
+        if (mEdit) {
             lo_edit.setVisibility(View.VISIBLE);
             ImageButton btn_edit = (ImageButton)view.findViewById(R.id.btn_edit);
             btn_edit.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent i = new Intent(sContext, EditNoteActivity.class);
-                    i.putExtra("noteid", note.id);
-                    sContext.startActivity(i);
+                    Intent i = new Intent(mContext, EditNoteActivity.class);
+                    i.putExtra(EditNoteActivity.NOTE_ID, note.id);
+                    mContext.startActivity(i);
                 }
             });
 
@@ -139,14 +141,14 @@ public class NoteAdapter extends BaseAdapter implements Model.DataChangeObserver
             btn_delete.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    AlertDialog.Builder alert = new AlertDialog.Builder(sContext);
-                    alert.setMessage(sContext.getText(R.string.confirm_delete) + note.description);
+                    AlertDialog.Builder alert = new AlertDialog.Builder(mContext);
+                    alert.setMessage(mContext.getText(R.string.confirm_delete) + note.description);
                     alert.setCancelable(true);
                     alert.setPositiveButton(android.R.string.ok,
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    sModel.deleteNote(sContext, note);
+                                    mModel.deleteNote(mContext, note);
                                 }
                             });
                     alert.setNegativeButton(android.R.string.cancel, null);

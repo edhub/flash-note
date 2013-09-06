@@ -7,6 +7,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class Model {
 
@@ -18,18 +20,53 @@ public class Model {
 
     private static Model sModel;
 
-    private ArrayList<Note> sAllNotes;
+    private static Comparator<Note> sCompDueDateDesc = new Comparator<Note>() {
+        @Override
+        public int compare(Note lhs, Note rhs) {
+            return (int)(rhs.dueDate - lhs.dueDate);
+        }
+    };
 
-    private ArrayList<Note> sDoneNotes;
+    private static Comparator<Note> sCompDueDateAsc = new Comparator<Note>() {
+        @Override
+        public int compare(Note lhs, Note rhs) {
+            return (int)(lhs.dueDate - rhs.dueDate);
+        }
+    };
 
-    private ArrayList<Note> sOngoingNotes;
+    private static Comparator<Note> sCompFinishDesc = new Comparator<Note>() {
+        @Override
+        public int compare(Note lhs, Note rhs) {
+            return (int)(rhs.finishedOn - lhs.finishedOn);
+        }
+    };
 
-    private ArrayList<DataChangeObserver> sObservers = new ArrayList<Model.DataChangeObserver>();
+    private ArrayList<Note> mAllNotes;
 
-    private Model(ArrayList<Note> all, ArrayList<Note> done, ArrayList<Note> ongoing) {
-        sAllNotes = all;
-        sDoneNotes = done;
-        sOngoingNotes = ongoing;
+    private ArrayList<Note> mDoneNotes;
+
+    private ArrayList<Note> mOngoingNotes;
+
+    private ArrayList<DataChangeObserver> mObservers = new ArrayList<Model.DataChangeObserver>();
+
+    private Model(ArrayList<Note> all) {
+        mAllNotes = all;
+
+        mDoneNotes = new ArrayList<Note>();
+        for (Note note : mAllNotes) {
+            if (note.finishedOn > 0) {
+                mDoneNotes.add(note);
+            }
+        }
+        Collections.sort(mDoneNotes, sCompFinishDesc);
+
+        mOngoingNotes = new ArrayList<Note>();
+        for (Note note : mAllNotes) {
+            if (note.finishedOn == 0) {
+                mOngoingNotes.add(0, note);
+            }
+        }
+        Collections.sort(mOngoingNotes, sCompDueDateAsc);
     }
 
     private static Model createModel(Context context) {
@@ -42,27 +79,15 @@ public class Model {
         int col_voice = c.getColumnIndex(Note.COL_VOICE);
         int col_prio = c.getColumnIndex(Note.COL_COLOR);
         int col_finishedOn = c.getColumnIndex(Note.COL_FINISHED_ON);
-        ArrayList<Note> all = new ArrayList<Note>();
-        ArrayList<Note> done = new ArrayList<Note>();
-        ArrayList<Note> ongoing = new ArrayList<Note>();
+        ArrayList<Note> notes = new ArrayList<Note>();
 
         while (c.moveToNext()) {
-            Note note = new Note(c.getInt(col_id), c.getString(col_desc), c.getLong(col_dueDate),
-                    c.getString(col_voice), c.getInt(col_prio), c.getLong(col_finishedOn));
-            all.add(note);
-            if (note.finishedOn > 0) {
-                done.add(note);
-            } else {
-                if (note.dueDate == 0) {
-                    ongoing.add(note);
-                } else {
-                    ongoing.add(0, note);
-                }
-            }
+            notes.add(new Note(c.getInt(col_id), c.getString(col_desc), c.getLong(col_dueDate),
+                    c.getString(col_voice), c.getInt(col_prio), c.getLong(col_finishedOn)));
         }
         c.close();
         db.close();
-        return new Model(all, done, ongoing);
+        return new Model(notes);
     }
 
     public static Model getModel(Context context, boolean createIfNotExist) {
@@ -79,22 +104,18 @@ public class Model {
     public ArrayList<Note> getNotes(int which) {
         switch (which) {
             case ALL:
-                return sAllNotes;
+                return mAllNotes;
             case DONE:
-                if (sDoneNotes == null) {
-                    sDoneNotes = new ArrayList<Note>();
-
-                }
-                return sDoneNotes;
+                return mDoneNotes;
             default:
-                return sOngoingNotes;
+                return mOngoingNotes;
         }
     }
 
     public void deleteNote(Context context, Note note) {
-        sAllNotes.remove(note);
-        sDoneNotes.remove(note);
-        sOngoingNotes.remove(note);
+        mAllNotes.remove(note);
+        mDoneNotes.remove(note);
+        mOngoingNotes.remove(note);
         if (note.voiceRecord.length() > 0) {
             context.deleteFile(note.voiceRecord);
         }
@@ -102,6 +123,40 @@ public class Model {
         db.delete(Note.TABLE_NAME, Note.COL_ID + "=" + note.id, null);
         db.close();
         notifyModelChanged();
+    }
+
+    public static Note getNoteById(Context context, long id) {
+        Note note = null;
+        if (sModel != null) {
+            note = sModel.getNote(id);
+        }
+
+        if (note == null) {
+            SQLiteDatabase db = (new DbHelper(context)).getReadableDatabase();
+            Cursor c = db.query(Note.TABLE_NAME, null, Note.COL_ID + "=" + id, null, null, null,
+                    Note.COL_DUEDATE + " desc");
+            if (c.moveToFirst()) {
+                int col_id = c.getColumnIndex(Note.COL_ID);
+                int col_desc = c.getColumnIndex(Note.COL_DESC);
+                int col_dueDate = c.getColumnIndex(Note.COL_DUEDATE);
+                int col_voice = c.getColumnIndex(Note.COL_VOICE);
+                int col_prio = c.getColumnIndex(Note.COL_COLOR);
+                int col_finishedOn = c.getColumnIndex(Note.COL_FINISHED_ON);
+                note = new Note(c.getInt(col_id), c.getString(col_desc),
+                        c.getLong(col_dueDate),
+                        c.getString(col_voice), c.getInt(col_prio), c.getLong(col_finishedOn));
+            }
+        }
+        return note;
+    }
+
+    public Note getNote(long id) {
+        for (Note note : mAllNotes) {
+            if (note.id == id) {
+                return note;
+            }
+        }
+        return null;
     }
 
     public static void insertNote(Context context, Note note) {
@@ -116,27 +171,11 @@ public class Model {
         db.close();
 
         if (sModel != null) {
-            sModel.addNote(note);
+            sModel.newNote(note);
         }
     }
 
-    public void finishNote(Context context, Note note) {
-        note.finishedOn = System.currentTimeMillis();
-        updateNote(context, note);
-        sDoneNotes.add(0, note);
-        sOngoingNotes.remove(note);
-        notifyModelChanged();
-    }
-
-    public void reOpenNote(Context context, Note note) {
-        note.finishedOn = 0;
-        updateNote(context, note);
-        sDoneNotes.remove(note);
-        insertOngoing(note);
-        notifyModelChanged();
-    }
-
-    private void updateNote(Context context, Note note) {
+    private static void updateNoteDb(Context context, Note note) {
         SQLiteDatabase db = (new DbHelper(context)).getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(Note.COL_DESC, note.description);
@@ -148,36 +187,67 @@ public class Model {
         db.close();
     }
 
-    private void addNote(Note note) {
-        sAllNotes.add(0, note);
-        insertOngoing(note);
+    public static void updateNote(Context context, Note note) {
+        updateNoteDb(context, note);
+        if (sModel != null) {
+            sModel.onNoteUpdated(note);
+        }
+    }
+
+    /**
+     * Sort and notify data observers.
+     *
+     * @param note
+     */
+    public void onNoteUpdated(Note note) {
+        Collections.sort(mAllNotes, sCompDueDateDesc);
+        if (note.finishedOn > 0) {
+            Collections.sort(mDoneNotes, sCompFinishDesc);
+        } else {
+            Collections.sort(mOngoingNotes, sCompDueDateAsc);
+        }
         notifyModelChanged();
     }
 
-    private void insertOngoing(Note note) {
-        if (note.dueDate == 0 || sOngoingNotes.size() == 0) {
-            sOngoingNotes.add(note);
-            return;
-        }
-        int count = sOngoingNotes.size();
-        for (int i = 0; i < count; i++) {
-            if (sOngoingNotes.get(i).dueDate > note.dueDate
-                    || sOngoingNotes.get(i).dueDate == 0
-                    || i == count - 1) {
-                sOngoingNotes.add(i, note);
-                break;
-            }
-        }
+    /**
+     * Mark a note as finished, and notify data observers.
+     *
+     * @param context
+     * @param note
+     */
+    public void finishNote(Context context, Note note) {
+        note.finishedOn = System.currentTimeMillis();
+        updateNoteDb(context, note);
+        mDoneNotes.add(0, note);
+        mOngoingNotes.remove(note);
+        notifyModelChanged();
+    }
+
+    public void reOpenNote(Context context, Note note) {
+        note.finishedOn = 0;
+        updateNoteDb(context, note);
+        mDoneNotes.remove(note);
+        mOngoingNotes.add(note);
+        Collections.sort(mOngoingNotes, sCompDueDateAsc);
+        notifyModelChanged();
+    }
+
+    private void newNote(Note note) {
+        mAllNotes.add(note);
+        Collections.sort(mAllNotes, sCompDueDateDesc);
+        mOngoingNotes.add(note);
+        Collections.sort(mOngoingNotes, sCompDueDateAsc);
+        notifyModelChanged();
     }
 
     public void notifyModelChanged() {
-        for (DataChangeObserver observer : sObservers) {
+        for (DataChangeObserver observer : mObservers) {
             observer.notifyModelChanged();
         }
     }
 
     public void registerObserver(DataChangeObserver observer) {
-        sObservers.add(observer);
+        mObservers.add(observer);
     }
 
     public static interface DataChangeObserver {

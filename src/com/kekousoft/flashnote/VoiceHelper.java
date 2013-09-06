@@ -11,41 +11,41 @@ import java.io.IOException;
 
 public class VoiceHelper {
 
-    private Context sContext;
+    private Context mContext;
 
-    private MediaPlayer sMediaPlayer;
+    private MediaPlayer mMediaPlayer;
 
-    private MediaRecorder sRecorder;
+    private MediaRecorder mRecorder;
 
-    private String sFilePrefix;
+    private String mFilePrefix;
 
     public VoiceHelper(Context context) {
-        sContext = context;
-        sFilePrefix = context.getFilesDir().getPath() + "/";
+        mContext = context;
+        mFilePrefix = context.getFilesDir().getPath() + "/";
     }
 
     public void playVoice(final String voiceRecord) {
-        Uri voiceUri = Uri.parse(sFilePrefix + voiceRecord);
-        if (sMediaPlayer != null) {
-            if (sMediaPlayer.isPlaying()) {
-                sMediaPlayer.stop();
+        Uri voiceUri = Uri.parse(mFilePrefix + voiceRecord);
+        if (mMediaPlayer != null) {
+            if (mMediaPlayer.isPlaying()) {
+                mMediaPlayer.stop();
             }
-            sMediaPlayer.reset();
+            mMediaPlayer.reset();
         } else {
-            sMediaPlayer = new MediaPlayer();
+            mMediaPlayer = new MediaPlayer();
         }
         try {
-            sMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            sMediaPlayer.setDataSource(sContext, voiceUri);
-            sMediaPlayer.prepare();
-            sMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            mMediaPlayer.setDataSource(mContext, voiceUri);
+            mMediaPlayer.prepare();
+            mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
-                    sMediaPlayer.release();
-                    sMediaPlayer = null;
+                    mMediaPlayer.release();
+                    mMediaPlayer = null;
                 }
             });
-            sMediaPlayer.start();
+            mMediaPlayer.start();
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         } catch (SecurityException e) {
@@ -59,16 +59,16 @@ public class VoiceHelper {
 
     public void startRecording(final String fileName) {
         stopPlaying();
-        if (sRecorder == null) {
-            sRecorder = new MediaRecorder();
+        if (mRecorder == null) {
+            mRecorder = new MediaRecorder();
         }
-        sRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        sRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        sRecorder.setOutputFile(sFilePrefix + fileName);
-        sRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+        mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        mRecorder.setOutputFile(mFilePrefix + fileName);
+        mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
         try {
-            sRecorder.prepare();
-            sRecorder.start();
+            mRecorder.prepare();
+            mRecorder.start();
         } catch (IllegalStateException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -78,19 +78,19 @@ public class VoiceHelper {
     }
 
     public void finishRecording() {
-        if (sRecorder != null) {
-            sRecorder.stop();
-            sRecorder.reset();
+        if (mRecorder != null) {
+            mRecorder.stop();
+            mRecorder.reset();
         }
     }
 
     public void stopPlaying() {
-        if (sMediaPlayer != null) {
-            if (sMediaPlayer.isPlaying()) {
-                sMediaPlayer.stop();
+        if (mMediaPlayer != null) {
+            if (mMediaPlayer.isPlaying()) {
+                mMediaPlayer.stop();
             }
-            sMediaPlayer.release();
-            sMediaPlayer = null;
+            mMediaPlayer.release();
+            mMediaPlayer = null;
         }
     }
 
