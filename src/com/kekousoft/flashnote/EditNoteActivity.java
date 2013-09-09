@@ -19,6 +19,10 @@ public class EditNoteActivity extends Activity {
 
     public static final String NOTE_ID = "com.kekousoft.flashnote.NOTEID";
 
+    private static String sNotScheduled;
+
+    private static int sMaxProgress;
+
     private long mDueDate;
 
     private boolean mDiscardVoice = true;
@@ -42,6 +46,8 @@ public class EditNoteActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_note);
         Resources res = getResources();
+        sMaxProgress = res.getInteger(R.integer.max_date_picker_progress);
+        sNotScheduled = res.getString(R.string.not_scheduled);
         mHandler = new Handler();
 
         String[] colors = res.getStringArray(R.array.colors);
@@ -58,31 +64,6 @@ public class EditNoteActivity extends Activity {
             mNote = Controller.getNoteById(this, id);
         }
 
-        // Init data for edit mode
-        if (mNote != null) {
-            for (int i = 0; i < mColors.length; i++) {
-                if (mNote.color == mColors[i]) {
-                    mColorIndex = i;
-                    break;
-                }
-            }
-            if (mNote.voiceRecord.length() > 0) {
-                ImageButton btn_play_orig = (ImageButton)findViewById(R.id.btn_play_orig);
-                btn_play_orig.setVisibility(View.VISIBLE);
-            }
-            if (mNote.dueDate > System.currentTimeMillis()) {
-                tv_date.setText(DateUtils.getRelativeTimeSpanString(mNote.dueDate));
-            }
-            if (mNote.description.length() > 0) {
-                ((EditText)findViewById(R.id.et_desc)).setText(mNote.description);
-            }
-        }
-
-        View v_prio = findViewById(R.id.v_prio);
-        v_prio.setBackgroundColor(nextColor());
-        View lo_desc = findViewById(R.id.lo_desc);
-        lo_desc.setBackgroundColor(getColor());
-
         SeekBar sb_date = (SeekBar)findViewById(R.id.sb_date);
         sb_date.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -98,6 +79,32 @@ public class EditNoteActivity extends Activity {
                 tv_date.setText(getTime(progress));
             }
         });
+
+        // Init data for edit mode
+        if (mNote != null) {
+            for (int i = 0; i < mColors.length; i++) {
+                if (mNote.color == mColors[i]) {
+                    mColorIndex = i;
+                    break;
+                }
+            }
+            if (mNote.voiceRecord.length() > 0) {
+                ImageButton btn_play_orig = (ImageButton)findViewById(R.id.btn_play_orig);
+                btn_play_orig.setVisibility(View.VISIBLE);
+            }
+            if (mNote.dueDate > 0) {
+                sb_date.setProgress(sMaxProgress);
+                tv_date.setText(DateUtils.getRelativeTimeSpanString(mNote.dueDate));
+            }
+            if (mNote.description.length() > 0) {
+                ((EditText)findViewById(R.id.et_desc)).setText(mNote.description);
+            }
+        }
+
+        View v_prio = findViewById(R.id.v_prio);
+        v_prio.setBackgroundColor(nextColor());
+        View lo_desc = findViewById(R.id.lo_desc);
+        lo_desc.setBackgroundColor(getColor());
 
         mVoiceHelper = new VoiceHelper(this);
         btn_record.setOnTouchListener(new View.OnTouchListener() {
@@ -222,23 +229,22 @@ public class EditNoteActivity extends Activity {
     }
 
     private String getTime(int progress) {
-        if (progress == 0) {
+        if (mNote != null && mNote.dueDate > 0 && progress == sMaxProgress) {
+            return DateUtils.getRelativeTimeSpanString(mNote.dueDate).toString();
+        } else if (progress == 0) {
             mDueDate = 0;
-        } else if (progress > 0 && progress <= 25) {
-            float num = progress * 1.0f / 25 * 60;
+        } else if (progress > 0 && progress <= 60) {
+            float num = progress * 1.0f;
             mDueDate = (long)(System.currentTimeMillis() + num * 60 * 1000);
-        } else if (progress > 25 && progress <= 50) {
-            float num = (progress - 24) * 1.0f / 25 * 24;
+        } else if (progress > 60 && progress <= 120) {
+            float num = (progress - 60) * 1.0f / 60 * 24 + 1;
             mDueDate = (long)(System.currentTimeMillis() + num * 60 * 60 * 1000);
-        } else if (progress > 50 && progress <= 75) {
-            float num = (progress - 50) * 1.0f / 25 * 30;
+        } else if (progress > 120) {
+            float num = (progress - 120) * 1.0f / 80 * 30 + 1;
             mDueDate = (long)(System.currentTimeMillis() + num * 24 * 60 * 60 * 1000);
-        } else if (progress > 75) {
-            float num = (progress - 74) * 1.0f / 2;
-            mDueDate = (long)(System.currentTimeMillis() + num * 30 * 24 * 60 * 60 * 1000);
         }
         if (mDueDate == 0) {
-            return "";
+            return sNotScheduled;
         }
         return DateUtils.getRelativeTimeSpanString(mDueDate).toString();
     }

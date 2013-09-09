@@ -9,5 +9,6 @@
         <item>#D94DFF</item>
         <item>#5E86C1</item>
     </string-array>
+    <item name="max_date_picker_progress" type="integer">200</item>
 
 </resources>
