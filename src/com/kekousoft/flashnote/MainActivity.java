@@ -37,6 +37,24 @@ public class MainActivity extends Activity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        mAdapter.setEdite(false);
+    }
+
+    @Override
+    protected void onStop() {
+        mVoiceHelper.stop();
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        mController.unRegisterObserver(mAdapter);
+        super.onDestroy();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
@@ -63,15 +81,4 @@ public class MainActivity extends Activity {
         mAdapter.toggleEdit();
     }
 
-    @Override
-    protected void onStop() {
-        mVoiceHelper.stop();
-        super.onStop();
-    }
-
-    @Override
-    protected void onDestroy() {
-        mController.unRegisterObserver(mAdapter);
-        super.onDestroy();
-    }
 }

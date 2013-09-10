@@ -25,7 +25,7 @@
             android:layout_width="45dp"
             android:layout_height="45dp"
             android:layout_alignTop="@+id/btn_record"
-            android:layout_marginLeft="20dp"
+            android:layout_marginLeft="10dp"
             android:layout_toRightOf="@+id/btn_record"
             android:background="@null"
             android:onClick="playVoiceOrig"
@@ -38,46 +38,47 @@
             android:layout_width="45dp"
             android:layout_height="45dp"
             android:layout_alignBottom="@+id/btn_record"
-            android:layout_marginLeft="20dp"
+            android:layout_marginLeft="10dp"
             android:layout_toRightOf="@+id/btn_record"
             android:background="@null"
             android:onClick="playVoice"
             android:scaleType="centerInside"
             android:src="@drawable/play"
             android:visibility="gone" />
-    </RelativeLayout>
-
-    <LinearLayout
-        android:id="@+id/lo_desc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/line_space"
-        android:orientation="horizontal" >
-
-        <EditText
-            android:id="@+id/et_desc"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ems="10"
-            android:hint="@string/description" >
-
-            <requestFocus />
-        </EditText>
 
         <View
-            android:id="@+id/v_prio"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:id="@+id/v_color"
+            android:layout_width="@dimen/color_box_size"
+            android:layout_height="@dimen/color_box_size"
+            android:layout_alignParentRight="true"
             android:clickable="true"
-            android:onClick="togglePrio" />
-    </LinearLayout>
+            android:onClick="toggleColor" >
+        </View>
+
+        <View
+            android:id="@+id/v_color_next"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentRight="true" />
+    </RelativeLayout>
+
+    <EditText
+        android:id="@+id/et_desc"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/line_space"
+        android:ems="10"
+        android:hint="@string/description" >
+
+        <requestFocus />
+    </EditText>
 
     <TextView
         android:id="@+id/tv_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/not_scheduled" />
+        android:text="@string/not_scheduled"
+        android:textColor="#444444" />
 
     <SeekBar
         android:id="@+id/sb_date"
@@ -86,25 +87,11 @@
         android:layout_marginBottom="@dimen/line_space"
         android:max="@integer/max_date_picker_progress" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-
-        <Button
-            android:id="@+id/btn_cancel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:onClick="cancelEdit"
-            android:text="@string/cancel" />
-
-        <Button
-            android:id="@+id/btn_save"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:onClick="saveNote"
-            android:text="@string/save" />
-    </LinearLayout>
+    <Button
+        android:id="@+id/btn_save"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:onClick="saveNote"
+        android:text="@string/save" />
 
 </LinearLayout>

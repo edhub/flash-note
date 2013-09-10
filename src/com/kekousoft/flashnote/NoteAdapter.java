@@ -48,6 +48,12 @@ public class NoteAdapter extends BaseAdapter implements Controller.DataChangeObs
         notifyDataSetChanged();
     }
 
+    public void setEdite(boolean edit) {
+        if (mEdit != edit) {
+            toggleEdit();
+        }
+    }
+
     @Override
     public int getCount() {
         return mModel.size();

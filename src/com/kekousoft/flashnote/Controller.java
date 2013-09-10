@@ -88,13 +88,13 @@ public class Controller {
         int col_desc = c.getColumnIndex(Note.COL_DESC);
         int col_dueDate = c.getColumnIndex(Note.COL_DUEDATE);
         int col_voice = c.getColumnIndex(Note.COL_VOICE);
-        int col_prio = c.getColumnIndex(Note.COL_COLOR);
+        int col_color = c.getColumnIndex(Note.COL_COLOR);
         int col_finishedOn = c.getColumnIndex(Note.COL_FINISHED_ON);
         ArrayList<Note> notes = new ArrayList<Note>();
 
         while (c.moveToNext()) {
             notes.add(new Note(c.getInt(col_id), c.getString(col_desc), c.getLong(col_dueDate),
-                    c.getString(col_voice), c.getInt(col_prio), c.getLong(col_finishedOn)));
+                    c.getString(col_voice), c.getInt(col_color), c.getLong(col_finishedOn)));
         }
         c.close();
         db.close();
@@ -153,11 +153,11 @@ public class Controller {
                 int col_desc = c.getColumnIndex(Note.COL_DESC);
                 int col_dueDate = c.getColumnIndex(Note.COL_DUEDATE);
                 int col_voice = c.getColumnIndex(Note.COL_VOICE);
-                int col_prio = c.getColumnIndex(Note.COL_COLOR);
+                int col_color = c.getColumnIndex(Note.COL_COLOR);
                 int col_finishedOn = c.getColumnIndex(Note.COL_FINISHED_ON);
                 note = new Note(c.getInt(col_id), c.getString(col_desc),
                         c.getLong(col_dueDate),
-                        c.getString(col_voice), c.getInt(col_prio), c.getLong(col_finishedOn));
+                        c.getString(col_voice), c.getInt(col_color), c.getLong(col_finishedOn));
             }
         }
         return note;

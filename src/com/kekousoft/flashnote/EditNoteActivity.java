@@ -101,10 +101,10 @@ public class EditNoteActivity extends Activity {
             }
         }
 
-        View v_prio = findViewById(R.id.v_prio);
-        v_prio.setBackgroundColor(nextColor());
-        View lo_desc = findViewById(R.id.lo_desc);
-        lo_desc.setBackgroundColor(getColor());
+        View v_color = findViewById(R.id.v_color);
+        v_color.setBackgroundColor(getColor());
+        View v_color_next = findViewById(R.id.v_color_next);
+        v_color_next.setBackgroundColor(nextColor());
 
         mVoiceHelper = new VoiceHelper(this);
         btn_record.setOnTouchListener(new View.OnTouchListener() {
@@ -181,11 +181,11 @@ public class EditNoteActivity extends Activity {
         mVoiceHelper.playVoice(mNote.voiceRecord);
     }
 
-    public void togglePrio(View v) {
+    public void toggleColor(View v) {
         mColorIndex = (mColorIndex + 1) % mColors.length;
-        View lo_desc = findViewById(R.id.lo_desc);
-        lo_desc.setBackgroundColor(getColor());
-        v.setBackgroundColor(nextColor());
+        View v_color_next = findViewById(R.id.v_color_next);
+        v.setBackgroundColor(getColor());
+        v_color_next.setBackgroundColor(nextColor());
     }
 
     private int nextColor() {
@@ -221,10 +221,6 @@ public class EditNoteActivity extends Activity {
         }
 
         mDiscardVoice = false;
-        finish();
-    }
-
-    public void cancelEdit(View v) {
         finish();
     }
 

@@ -3,7 +3,6 @@
 
     <string name="app_name">FlashNote</string>
     <string name="edit">Edit</string>
-    <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="description">Description</string>
     <string name="add_note">New</string>
