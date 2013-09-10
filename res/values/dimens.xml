@@ -3,5 +3,6 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="line_space">13dp</dimen>
     <dimen name="color_box_size">55dp</dimen>
+    <dimen name="widget_margin">0dp</dimen>
 
 </resources>

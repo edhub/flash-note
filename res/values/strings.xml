@@ -5,6 +5,7 @@
     <string name="tasks">Tasks</string>
     <string name="delete">Delete</string>
     <string name="description">Description</string>
+    <string name="no_description">No description</string>
     <string name="add_note">New</string>
     <string name="basic_info_missing">Please record a voice or enter some description!</string>
     <string name="ongoing">Ongoing</string>

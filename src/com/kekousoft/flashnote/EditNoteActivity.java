@@ -25,6 +25,8 @@ public class EditNoteActivity extends Activity {
 
     private static int sMaxProgress;
 
+    private int mDateIncicator = 60;
+
     private long mDueDate;
 
     private boolean mDiscardVoice = true;
@@ -66,7 +68,8 @@ public class EditNoteActivity extends Activity {
             mNote = Controller.getNoteById(this, id);
         }
 
-        SeekBar sb_date = (SeekBar)findViewById(R.id.sb_date);
+        final SeekBar sb_date = (SeekBar)findViewById(R.id.sb_date);
+        sb_date.setSecondaryProgress(mDateIncicator);
         sb_date.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
@@ -78,6 +81,19 @@ public class EditNoteActivity extends Activity {
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                int dateIndicator;
+                if (progress > 120) {
+                    dateIndicator = sMaxProgress;
+                } else if (progress > 60) {
+                    dateIndicator = 120;
+                } else {
+                    dateIndicator = 60;
+                }
+                if (dateIndicator != mDateIncicator) {
+                    sb_date.setSecondaryProgress(dateIndicator);
+                    mDateIncicator = dateIndicator;
+                }
+
                 tv_date.setText(getTime(progress));
             }
         });

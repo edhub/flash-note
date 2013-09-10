@@ -3,12 +3,10 @@ package com.kekousoft.flashnote;
 
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +28,10 @@ public class NoteAdapter extends BaseAdapter implements Controller.DataChangeObs
 
     private int mCurrentModel = Controller.MODEL_ONGOING;
 
+    private final String mFinishedOn;
+
+    private final String mNoDesc;
+
     private Controller mController;
 
     private VoiceHelper mVoiceHelper;
@@ -42,6 +44,9 @@ public class NoteAdapter extends BaseAdapter implements Controller.DataChangeObs
         mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mController = model;
         mModel = mController.getModel(Controller.MODEL_ONGOING);
+
+        mFinishedOn = mContext.getString(R.string.finished_on);
+        mNoDesc = mContext.getString(R.string.no_description);
     }
 
     public void changeModel(int which) {
@@ -76,7 +81,6 @@ public class NoteAdapter extends BaseAdapter implements Controller.DataChangeObs
         return mModel.get(position).id;
     }
 
-    @SuppressLint("NewApi")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         final View view;
@@ -87,21 +91,26 @@ public class NoteAdapter extends BaseAdapter implements Controller.DataChangeObs
         }
         final Note note = mModel.get(position);
 
-        if (Build.VERSION.SDK_INT > 11) {
-            view.setAlpha(1f);
-        }
+        view.setAlpha(1f);
         view.setBackgroundColor(note.color);
-        view.setOnClickListener(new OnClickListener() {
+
+        view.findViewById(R.id.lo_desc).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(mContext, EditNoteActivity.class);
                 i.putExtra(EditNoteActivity.NOTE_ID, note.id);
+                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 mContext.startActivity(i);
             }
         });
 
         TextView tv_desc = (TextView)view.findViewById(R.id.tv_desc);
-        tv_desc.setText(note.description);
+        if (note.description.length() > 0) {
+            tv_desc.setText(note.description);
+        } else {
+            tv_desc.setText(mNoDesc);
+        }
+
         if (note.finishedOn > 0) {
             tv_desc.getPaint().setStrikeThruText(true);
         } else {
@@ -115,7 +124,7 @@ public class NoteAdapter extends BaseAdapter implements Controller.DataChangeObs
             tv_date.setText(dateStr);
         }
         if (note.finishedOn > 0) {
-            dateStr += String.format(mContext.getString(R.string.finished_on),
+            dateStr += String.format(mFinishedOn,
                     DateUtils.getRelativeTimeSpanString(note.finishedOn));
         }
         if (dateStr.length() > 0) {
@@ -143,7 +152,7 @@ public class NoteAdapter extends BaseAdapter implements Controller.DataChangeObs
             btn_finish.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (mCurrentModel == Controller.MODEL_ONGOING && Build.VERSION.SDK_INT > 11) {
+                    if (mCurrentModel == Controller.MODEL_ONGOING) {
                         btn_finish.setImageResource(R.drawable.ic_checkbox_checked);
                         btn_finish.setEnabled(false);
                         view.animate().alpha(0f).setDuration(200)
@@ -177,7 +186,7 @@ public class NoteAdapter extends BaseAdapter implements Controller.DataChangeObs
             btn_finish.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (mCurrentModel == Controller.MODEL_DONE && Build.VERSION.SDK_INT > 11) {
+                    if (mCurrentModel == Controller.MODEL_DONE) {
                         btn_finish.setImageResource(R.drawable.ic_checkbox);
                         btn_finish.setEnabled(false);
                         view.animate().alpha(0).setDuration(300)
@@ -221,32 +230,29 @@ public class NoteAdapter extends BaseAdapter implements Controller.DataChangeObs
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    if (Build.VERSION.SDK_INT > 11) {
-                                        btn_delete.setEnabled(false);
-                                        view.animate().alpha(0).setDuration(500)
-                                                .setListener(new AnimatorListener() {
-                                                    @Override
-                                                    public void onAnimationCancel(Animator animation) {
-                                                    }
+                                    btn_delete.setEnabled(false);
+                                    view.animate().alpha(0).setDuration(500)
+                                            .setListener(new AnimatorListener() {
+                                                @Override
+                                                public void onAnimationCancel(Animator animation) {
+                                                }
 
-                                                    @Override
-                                                    public void onAnimationEnd(Animator animation) {
-                                                        btn_delete.setEnabled(true);
-                                                        mController.deleteNote(mContext, note);
-                                                    }
+                                                @Override
+                                                public void onAnimationEnd(Animator animation) {
+                                                    btn_delete.setEnabled(true);
+                                                    mController.deleteNote(mContext, note);
+                                                }
 
-                                                    @Override
-                                                    public void onAnimationRepeat(Animator animation) {
-                                                    }
+                                                @Override
+                                                public void onAnimationRepeat(Animator animation) {
+                                                }
 
-                                                    @Override
-                                                    public void onAnimationStart(Animator animation) {
-                                                    }
+                                                @Override
+                                                public void onAnimationStart(Animator animation) {
+                                                }
 
-                                                });
-                                    } else {
-                                        mController.deleteNote(mContext, note);
-                                    }
+                                            });
+
                                 }
                             });
                     alert.setNegativeButton(android.R.string.cancel, null);

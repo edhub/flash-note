@@ -17,7 +17,8 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_alignParentLeft="true"
-            android:background="@drawable/btn_bg_selector"
+            android:background="@drawable/item_bg_selector"
+            android:padding="11dp"
             android:scaleType="centerInside"
             android:src="@drawable/ic_mic" />
 
@@ -28,8 +29,9 @@
             android:layout_alignTop="@+id/btn_record"
             android:layout_marginLeft="6dp"
             android:layout_toRightOf="@+id/btn_record"
-            android:background="@drawable/btn_bg_selector"
+            android:background="@drawable/item_bg_selector"
             android:onClick="playVoiceOrig"
+            android:padding="6dp"
             android:scaleType="centerInside"
             android:src="@drawable/ic_play"
             android:visibility="gone" />
@@ -41,8 +43,9 @@
             android:layout_alignBottom="@+id/btn_record"
             android:layout_marginLeft="6dp"
             android:layout_toRightOf="@+id/btn_record"
-            android:background="@drawable/btn_bg_selector"
+            android:background="@drawable/item_bg_selector"
             android:onClick="playVoice"
+            android:padding="6dp"
             android:scaleType="centerInside"
             android:src="@drawable/ic_play"
             android:visibility="gone" />
@@ -50,7 +53,7 @@
         <View
             android:id="@+id/v_color_next"
             android:layout_width="@dimen/color_box_size"
-            android:layout_height="@dimen/color_box_size"
+            android:layout_height="100dp"
             android:layout_alignParentRight="true"
             android:clickable="true"
             android:onClick="toggleColor" >

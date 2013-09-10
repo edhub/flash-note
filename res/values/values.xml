@@ -2,6 +2,7 @@
 <resources>
 
     <color name="activity_bg">#F5F5DC</color>
+    <color name="item_bg_pressed">#DDDDDDDD</color>
 
     <string-array name="colors">
         <item>#7AB8BC</item>

@@ -2,10 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="5dp"
-    android:paddingTop="10dp"
-    android:paddingBottom="10dp"
-    android:paddingRight="5dp"
+    android:padding="10dp"
     android:background="@color/activity_bg"
     tools:context=".MainActivity" >
 
@@ -15,10 +12,8 @@
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:paddingLeft="10dp"
         android:divider="@null"
-        android:dividerHeight="10dp"
-        android:scrollbarStyle="outsideInset" >
+        android:dividerHeight="4dp">
     </ListView>
 
 </RelativeLayout>

@@ -5,6 +5,7 @@
     <string name="tasks">任务</string>
     <string name="delete">删除</string>
     <string name="description">描述</string>
+    <string name="no_description">无描述</string>
     <string name="add_note">添加</string>
     <string name="basic_info_missing">请录音或添加描述！</string>
     <string name="ongoing">进行中</string>
