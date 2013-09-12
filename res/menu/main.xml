@@ -2,33 +2,41 @@
 
     <item
         android:id="@+id/act_edit"
-        android:onClick="toggleEdit"
+        android:onClick="toggleDelete"
         android:orderInCategory="100"
         android:showAsAction="always"
-        android:title="@string/edit"/>
+        android:title="@string/delete"/>
     <item
         android:id="@+id/act_new"
         android:onClick="newNote"
-        android:orderInCategory="100"
+        android:orderInCategory="200"
         android:showAsAction="always"
         android:title="@string/add_note"/>
     <item
-        android:id="@+id/act_ongoing"
-        android:onClick="showOngoing"
-        android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/ongoing"/>
-    <item
-        android:id="@+id/act_past"
-        android:onClick="showDone"
-        android:orderInCategory="200"
-        android:showAsAction="never"
-        android:title="@string/done"/>
-    <item
-        android:id="@+id/act_all"
-        android:onClick="showAll"
+        android:id="@+id/sdfsdfsd"
         android:orderInCategory="300"
-        android:showAsAction="never"
-        android:title="@string/all"/>
+        android:showAsAction="always"
+        android:title="@string/tasks">
+        <menu>
+            <item
+                android:id="@+id/act_ongoing"
+                android:onClick="showOngoing"
+                android:orderInCategory="100"
+                android:showAsAction="never"
+                android:title="@string/ongoing"/>
+            <item
+                android:id="@+id/act_past"
+                android:onClick="showDone"
+                android:orderInCategory="200"
+                android:showAsAction="never"
+                android:title="@string/done"/>
+            <item
+                android:id="@+id/act_all"
+                android:onClick="showAll"
+                android:orderInCategory="300"
+                android:showAsAction="never"
+                android:title="@string/all"/>
+        </menu>
+    </item>
 
 </menu>

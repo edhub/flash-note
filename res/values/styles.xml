@@ -1,6 +1,5 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="AppTheme" parent="android:Theme.DeviceDefault">
-    </style>
+    <style name="AppTheme" parent="android:Theme.DeviceDefault"></style>
 
 </resources>

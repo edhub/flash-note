@@ -4,11 +4,11 @@
     <color name="activity_bg">#F5F5DC</color>
 
     <string-array name="colors">
-        <item>#00BFFF</item>
-        <item>#FF7300</item>
-        <item>#D94DFF</item>
-        <item>#5E86C1</item>
+        <item>#7AB8BC</item>
+        <item>#D2B49C</item>
+        <item>#B3A9DD</item>
     </string-array>
+
     <item name="max_date_picker_progress" type="integer">200</item>
 
 </resources>

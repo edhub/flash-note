@@ -22,7 +22,7 @@ public class NoteAdapter extends BaseAdapter implements Controller.DataChangeObs
 
     private LayoutInflater mInflater;
 
-    private boolean mEdit = false;
+    private boolean mShowDelete = false;
 
     private Controller mController;
 
@@ -43,14 +43,14 @@ public class NoteAdapter extends BaseAdapter implements Controller.DataChangeObs
         notifyDataSetChanged();
     }
 
-    public void toggleEdit() {
-        mEdit = !mEdit;
+    public void toggleDelete() {
+        mShowDelete = !mShowDelete;
         notifyDataSetChanged();
     }
 
-    public void setEdite(boolean edit) {
-        if (mEdit != edit) {
-            toggleEdit();
+    public void hideDelete() {
+        if (mShowDelete) {
+            toggleDelete();
         }
     }
 
@@ -80,20 +80,37 @@ public class NoteAdapter extends BaseAdapter implements Controller.DataChangeObs
         final Note note = mModel.get(position);
 
         view.setBackgroundColor(note.color);
+        view.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(mContext, EditNoteActivity.class);
+                i.putExtra(EditNoteActivity.NOTE_ID, note.id);
+                mContext.startActivity(i);
+            }
+        });
 
         TextView tv_desc = (TextView)view.findViewById(R.id.tv_desc);
         tv_desc.setText(note.description);
+        if (note.finishedOn > 0) {
+            tv_desc.getPaint().setStrikeThruText(true);
+        } else {
+            tv_desc.getPaint().setStrikeThruText(false);
+        }
 
         TextView tv_date = (TextView)view.findViewById(R.id.tv_date);
+        String dateStr = "";
         if (note.dueDate > 0) {
-            String dateStr = DateUtils.getRelativeTimeSpanString(note.dueDate).toString();
-            if (note.finishedOn > 0) {
-                dateStr += String.format(mContext.getString(R.string.finished_on),
-                        DateUtils.getRelativeTimeSpanString(note.finishedOn));
-            }
+            dateStr = DateUtils.getRelativeTimeSpanString(note.dueDate).toString();
+            tv_date.setText(dateStr);
+        }
+        if (note.finishedOn > 0) {
+            dateStr += String.format(mContext.getString(R.string.finished_on),
+                    DateUtils.getRelativeTimeSpanString(note.finishedOn));
+        }
+        if (dateStr.length() > 0) {
             tv_date.setText(dateStr);
         } else {
-            tv_date.setText("");
+            tv_date.setText(R.string.not_scheduled);
         }
 
         ImageButton btn_play_voice = (ImageButton)view.findViewById(R.id.btn_play_voice);
@@ -111,7 +128,7 @@ public class NoteAdapter extends BaseAdapter implements Controller.DataChangeObs
 
         ImageButton btn_finish = (ImageButton)view.findViewById(R.id.btn_finish);
         if (note.finishedOn == 0) {
-            btn_finish.setImageResource(R.drawable.finish);
+            btn_finish.setImageResource(R.drawable.ic_checkbox);
             btn_finish.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -119,7 +136,7 @@ public class NoteAdapter extends BaseAdapter implements Controller.DataChangeObs
                 }
             });
         } else {
-            btn_finish.setImageResource(R.drawable.reopen);
+            btn_finish.setImageResource(R.drawable.ic_checkbox_checked);
             btn_finish.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -128,21 +145,9 @@ public class NoteAdapter extends BaseAdapter implements Controller.DataChangeObs
             });
         }
 
-        View lo_edit = view.findViewById(R.id.lo_edit);
-        lo_edit.setTag(note.id);
-        if (mEdit) {
-            lo_edit.setVisibility(View.VISIBLE);
-            ImageButton btn_edit = (ImageButton)view.findViewById(R.id.btn_edit);
-            btn_edit.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent i = new Intent(mContext, EditNoteActivity.class);
-                    i.putExtra(EditNoteActivity.NOTE_ID, note.id);
-                    mContext.startActivity(i);
-                }
-            });
-
-            ImageButton btn_delete = (ImageButton)view.findViewById(R.id.btn_delete);
+        ImageButton btn_delete = (ImageButton)view.findViewById(R.id.btn_delete);
+        if (mShowDelete) {
+            btn_delete.setVisibility(View.VISIBLE);
             btn_delete.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -161,7 +166,7 @@ public class NoteAdapter extends BaseAdapter implements Controller.DataChangeObs
                 }
             });
         } else {
-            lo_edit.setVisibility(View.GONE);
+            btn_delete.setVisibility(View.GONE);
         }
 
         return view;

@@ -7,6 +7,8 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.format.DateUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
@@ -89,8 +91,7 @@ public class EditNoteActivity extends Activity {
                 }
             }
             if (mNote.voiceRecord.length() > 0) {
-                ImageButton btn_play_orig = (ImageButton)findViewById(R.id.btn_play_orig);
-                btn_play_orig.setVisibility(View.VISIBLE);
+                findViewById(R.id.btn_play_orig).setVisibility(View.VISIBLE);
             }
             if (mNote.dueDate > 0) {
                 sb_date.setProgress(sMaxProgress);
@@ -133,7 +134,7 @@ public class EditNoteActivity extends Activity {
             if (timeSpan < 400) {
                 final ImageButton btn_record = (ImageButton)findViewById(R.id.btn_record);
                 btn_record.setEnabled(false);
-                Toast.makeText(this, "Too short", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.recording_too_short, Toast.LENGTH_SHORT).show();
                 mHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -143,13 +144,22 @@ public class EditNoteActivity extends Activity {
                         btn_play.setVisibility(View.GONE);
                         btn_record.setEnabled(true);
                     }
-                }, 300 - timeSpan);
+                }, 400 - timeSpan);
             } else {
                 mVoiceHelper.finishRecording();
                 btn_play.setVisibility(View.VISIBLE);
             }
             mRecordStart = 0;
         }
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.edit, menu);
+        return true;
+    }
+
+    public void cancelNote(MenuItem mi) {
+        finish();
     }
 
     @Override
@@ -183,9 +193,9 @@ public class EditNoteActivity extends Activity {
 
     public void toggleColor(View v) {
         mColorIndex = (mColorIndex + 1) % mColors.length;
-        View v_color_next = findViewById(R.id.v_color_next);
-        v.setBackgroundColor(getColor());
-        v_color_next.setBackgroundColor(nextColor());
+        View v_color = findViewById(R.id.v_color);
+        v.setBackgroundColor(nextColor());
+        v_color.setBackgroundColor(getColor());
     }
 
     private int nextColor() {
@@ -197,7 +207,7 @@ public class EditNoteActivity extends Activity {
         return mColors[mColorIndex];
     }
 
-    public void saveNote(View v) {
+    public void saveNote(MenuItem mi) {
         String description = ((EditText)findViewById(R.id.et_desc)).getText().toString();
         if (mNote == null && mVoiceFile.length() == 0 && description.length() == 0) {
             Toast.makeText(this, R.string.basic_info_missing, Toast.LENGTH_SHORT).show();

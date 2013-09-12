@@ -2,8 +2,8 @@
 <resources>
 
     <string name="app_name">FlashNote</string>
-    <string name="edit">Edit</string>
-    <string name="save">Save</string>
+    <string name="tasks">Tasks</string>
+    <string name="delete">Delete</string>
     <string name="description">Description</string>
     <string name="add_note">New</string>
     <string name="basic_info_missing">Please record a voice or enter some description!</string>
@@ -14,5 +14,6 @@
     <string name="finished_on">(Finished on: %1$s)</string>
     <string name="notification_title">Reminder:</string>
     <string name="not_scheduled">Not scheduled</string>
+    <string name="recording_too_short">Recording is too short!</string>
 
 </resources>

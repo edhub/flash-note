@@ -39,7 +39,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-        mAdapter.setEdite(false);
+        mAdapter.hideDelete();
     }
 
     @Override
@@ -77,8 +77,8 @@ public class MainActivity extends Activity {
         mAdapter.changeModel(Controller.MODEL_ALL);
     }
 
-    public void toggleEdit(MenuItem mi) {
-        mAdapter.toggleEdit();
+    public void toggleDelete(MenuItem mi) {
+        mAdapter.toggleDelete();
     }
 
 }

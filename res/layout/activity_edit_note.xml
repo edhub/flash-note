@@ -7,6 +7,7 @@
     android:padding="10dp" >
 
     <RelativeLayout
+        android:id="@+id/v_color"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/line_space" >
@@ -16,21 +17,21 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_alignParentLeft="true"
-            android:background="@drawable/recording_selector"
+            android:background="@drawable/btn_bg_selector"
             android:scaleType="centerInside"
-            android:src="@drawable/recording" />
+            android:src="@drawable/ic_mic" />
 
         <ImageButton
             android:id="@+id/btn_play_orig"
             android:layout_width="45dp"
             android:layout_height="45dp"
             android:layout_alignTop="@+id/btn_record"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="6dp"
             android:layout_toRightOf="@+id/btn_record"
-            android:background="@null"
+            android:background="@drawable/btn_bg_selector"
             android:onClick="playVoiceOrig"
             android:scaleType="centerInside"
-            android:src="@drawable/play"
+            android:src="@drawable/ic_play"
             android:visibility="gone" />
 
         <ImageButton
@@ -38,28 +39,22 @@
             android:layout_width="45dp"
             android:layout_height="45dp"
             android:layout_alignBottom="@+id/btn_record"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="6dp"
             android:layout_toRightOf="@+id/btn_record"
-            android:background="@null"
+            android:background="@drawable/btn_bg_selector"
             android:onClick="playVoice"
             android:scaleType="centerInside"
-            android:src="@drawable/play"
+            android:src="@drawable/ic_play"
             android:visibility="gone" />
 
         <View
-            android:id="@+id/v_color"
+            android:id="@+id/v_color_next"
             android:layout_width="@dimen/color_box_size"
             android:layout_height="@dimen/color_box_size"
             android:layout_alignParentRight="true"
             android:clickable="true"
             android:onClick="toggleColor" >
         </View>
-
-        <View
-            android:id="@+id/v_color_next"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_alignParentRight="true" />
     </RelativeLayout>
 
     <EditText
@@ -68,7 +63,9 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/line_space"
         android:ems="10"
-        android:hint="@string/description" >
+        android:hint="@string/description"
+        android:maxLines="5"
+        android:textColor="#444444" >
 
         <requestFocus />
     </EditText>
@@ -86,12 +83,5 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/line_space"
         android:max="@integer/max_date_picker_progress" />
-
-    <Button
-        android:id="@+id/btn_save"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:onClick="saveNote"
-        android:text="@string/save" />
 
 </LinearLayout>

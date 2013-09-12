@@ -23,31 +23,34 @@ public class Controller {
     private static Comparator<Note> sCompDueDateDesc = new Comparator<Note>() {
         @Override
         public int compare(Note lhs, Note rhs) {
-            return (int)(rhs.dueDate - lhs.dueDate);
+            if (lhs.dueDate == rhs.dueDate) {
+                return 0;
+            }
+            return lhs.dueDate < rhs.dueDate ? 1 : -1;
         }
     };
 
     private static Comparator<Note> sCompDueDateAsc = new Comparator<Note>() {
         @Override
         public int compare(Note lhs, Note rhs) {
-            if (lhs.dueDate == 0) {
-                return Integer.MAX_VALUE;
+            if (lhs.dueDate == rhs.dueDate) {
+                return 0;
+            } else if (lhs.dueDate == 0) {
+                return 2;
             } else if (rhs.dueDate == 0) {
-                return Integer.MIN_VALUE;
+                return -2;
             }
-            return (int)(lhs.dueDate - rhs.dueDate);
+            return lhs.dueDate > rhs.dueDate ? 1 : -1;
         }
     };
 
     private static Comparator<Note> sCompFinishDesc = new Comparator<Note>() {
         @Override
         public int compare(Note lhs, Note rhs) {
-            if (lhs.dueDate == 0) {
-                return Integer.MAX_VALUE;
-            } else if (rhs.dueDate == 0) {
-                return Integer.MIN_VALUE;
+            if (rhs.finishedOn == lhs.finishedOn) {
+                return 0;
             }
-            return (int)(rhs.finishedOn - lhs.finishedOn);
+            return rhs.finishedOn > lhs.finishedOn ? 1 : -1;
         }
     };
 

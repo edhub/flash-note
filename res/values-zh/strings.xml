@@ -2,8 +2,8 @@
 <resources>
 
     <string name="app_name">闪记</string>
-    <string name="edit">编辑</string>
-    <string name="save">保存</string>
+    <string name="tasks">任务</string>
+    <string name="delete">删除</string>
     <string name="description">描述</string>
     <string name="add_note">添加</string>
     <string name="basic_info_missing">请录音或添加描述！</string>
@@ -14,5 +14,6 @@
     <string name="finished_on">（完成于：%1$s）</string>
     <string name="notification_title">事件提醒：</string>
     <string name="not_scheduled">无定时</string>
+    <string name="recording_too_short">录音太短！</string>
 
 </resources>
