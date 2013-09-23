@@ -10,7 +10,6 @@
         android:layout_height="match_parent"
         android:alpha="0.6"
         android:background="@drawable/item_bg_selector"
-        android:focusable="false"
         android:padding="6dp"
         android:scaleType="centerInside"
         android:src="@drawable/ic_checkbox" />
@@ -45,7 +44,6 @@
         android:layout_height="match_parent"
         android:alpha="0.7"
         android:background="@drawable/item_bg_selector"
-        android:focusable="false"
         android:padding="6dp"
         android:scaleType="centerInside"
         android:src="@drawable/ic_play" />
@@ -56,7 +54,6 @@
         android:layout_height="match_parent"
         android:alpha="0.7"
         android:background="@drawable/item_bg_selector"
-        android:focusable="false"
         android:padding="6dp"
         android:scaleType="centerInside"
         android:src="@drawable/ic_trash"

@@ -34,7 +34,7 @@
             android:uiOptions="splitActionBarWhenNarrow" >
         </activity>
 
-        <receiver android:name="AlarmMaker$AlarmReceiver" >
+        <receiver android:name=".alarm.AlarmMaker$AlarmReceiver" >
         </receiver>
         <receiver android:name=".widget.FlashNoteWidgetProvider" >
             <intent-filter>

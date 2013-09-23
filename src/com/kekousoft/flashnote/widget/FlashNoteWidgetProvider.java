@@ -35,7 +35,6 @@ public class FlashNoteWidgetProvider extends AppWidgetProvider {
             rv.setPendingIntentTemplate(R.id.lv_notes, pi);
 
             appWidgetManager.updateAppWidget(appWidgetIds[i], rv);
-            super.onUpdate(context, appWidgetManager, appWidgetIds);
         }
     }
 

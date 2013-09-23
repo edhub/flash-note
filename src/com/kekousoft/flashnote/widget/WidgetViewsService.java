@@ -5,7 +5,6 @@ import com.kekousoft.flashnote.Controller;
 import com.kekousoft.flashnote.Note;
 import com.kekousoft.flashnote.R;
 
-import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.text.format.DateUtils;
@@ -21,12 +20,9 @@ public class WidgetViewsService extends RemoteViewsService {
         return new WidgetViewsFactory(this.getApplicationContext(), intent);
     }
 
-    private static class WidgetViewsFactory implements RemoteViewsService.RemoteViewsFactory,
-            Controller.DataChangeObserver {
+    private static class WidgetViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
         private Context mContext;
-
-        private int mAppWidgetId;
 
         private final String mNotScheduled;
 
@@ -36,8 +32,6 @@ public class WidgetViewsService extends RemoteViewsService {
 
         public WidgetViewsFactory(Context context, Intent intent) {
             mContext = context;
-            mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
-                    AppWidgetManager.INVALID_APPWIDGET_ID);
             mNoDescription = mContext.getString(R.string.no_description);
             mNotScheduled = mContext.getString(R.string.not_scheduled);
         }
@@ -87,12 +81,12 @@ public class WidgetViewsService extends RemoteViewsService {
                 views.setTextViewText(R.id.tv_desc, mNoDescription);
             }
 
+            String dateStr = mNotScheduled;
             if (note.dueDate > 0) {
-                views.setTextViewText(R.id.tv_date,
-                        DateUtils.getRelativeTimeSpanString(note.dueDate));
-            } else {
-                views.setTextViewText(R.id.tv_date, mNotScheduled);
+
+                dateStr = DateUtils.getRelativeTimeSpanString(note.dueDate).toString();
             }
+            views.setTextViewText(R.id.tv_date, dateStr);
 
             return views;
         }
@@ -109,9 +103,7 @@ public class WidgetViewsService extends RemoteViewsService {
 
         @Override
         public void onCreate() {
-            Controller ctrl = Controller.getInstance(mContext, true);
-            ctrl.registerObserver(this);
-            mModel = ctrl.getModel(Controller.MODEL_ONGOING);
+            mModel = Controller.getInstance(mContext, true).getModel(Controller.MODEL_ONGOING);
         }
 
         @Override
@@ -120,14 +112,6 @@ public class WidgetViewsService extends RemoteViewsService {
 
         @Override
         public void onDestroy() {
-            Controller ctrl = Controller.getInstance(mContext, true);
-            ctrl.unRegisterObserver(this);
-        }
-
-        @Override
-        public void notifyModelChanged() {
-            AppWidgetManager.getInstance(mContext)
-                    .notifyAppWidgetViewDataChanged(mAppWidgetId, R.id.lv_notes);
         }
     }
 }

@@ -121,7 +121,6 @@ public class NoteAdapter extends BaseAdapter implements Controller.DataChangeObs
         String dateStr = "";
         if (note.dueDate > 0) {
             dateStr = DateUtils.getRelativeTimeSpanString(note.dueDate).toString();
-            tv_date.setText(dateStr);
         }
         if (note.finishedOn > 0) {
             dateStr += String.format(mFinishedOn,

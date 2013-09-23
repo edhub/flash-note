@@ -1,7 +1,7 @@
 
 package com.kekousoft.flashnote;
 
-import com.kekousoft.flashnote.AlarmMaker.AlarmReceiver;
+import com.kekousoft.flashnote.alarm.AlarmMaker.AlarmReceiver;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -28,12 +28,12 @@ public class MainActivity extends Activity {
         mAdapter = new NoteAdapter(this, mController, mVoiceHelper);
         mController.registerObserver(mAdapter);
 
-        Intent i = new Intent(this, AlarmReceiver.class);
-        i.putExtra(AlarmMaker.SETUP_ALARM, "");
-        startService(i);
-
         ListView lv_notes = (ListView)findViewById(R.id.lv_notes);
         lv_notes.setAdapter(mAdapter);
+
+        // Always update alarm on startup
+        Intent i = new Intent(this, AlarmReceiver.class);
+        sendBroadcast(i);
     }
 
     @Override

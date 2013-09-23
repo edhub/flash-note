@@ -1,6 +1,8 @@
 
 package com.kekousoft.flashnote;
 
+import com.kekousoft.flashnote.alarm.AlarmMaker;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -141,6 +143,29 @@ public class Controller {
         notifyModelChanged();
     }
 
+    public static Note getUpcomingNote(Context context) {
+        SQLiteDatabase db = new DbHelper(context).getReadableDatabase();
+        Cursor c = db.query(
+                Note.TABLE_NAME,
+                new String[] {
+                    Note.COL_ID
+                },
+                Note.COL_FINISHED_ON + "=0 and " + Note.COL_DUEDATE + ">"
+                        + System.currentTimeMillis(), null, null, null, Note.COL_DUEDATE
+                        + " asc", "1");
+        long id = 0;
+        if (c.moveToFirst()) {
+            id = c.getLong(0);
+        }
+        c.close();
+        db.close();
+        if (id > 0) {
+            return getNoteById(context, id);
+        } else {
+            return null;
+        }
+    }
+
     public static Note getNoteById(Context context, long id) {
         Note note = null;
         if (sController != null) {
@@ -162,6 +187,8 @@ public class Controller {
                         c.getLong(col_dueDate),
                         c.getString(col_voice), c.getInt(col_color), c.getLong(col_finishedOn));
             }
+            c.close();
+            db.close();
         }
         return note;
     }
@@ -239,6 +266,11 @@ public class Controller {
         notifyModelChanged();
     }
 
+    /**
+     * Reopen a note, and notify data observers.
+     * @param context
+     * @param note
+     */
     public void reOpenNote(Context context, Note note) {
         note.finishedOn = 0;
         updateNoteDb(context, note);
@@ -248,6 +280,10 @@ public class Controller {
         notifyModelChanged();
     }
 
+    /**
+     * Add a note to models, and notify data observers.
+     * @param note
+     */
     private void newNote(Note note) {
         mAllNotes.add(note);
         Collections.sort(mAllNotes, sCompDueDateDesc);
