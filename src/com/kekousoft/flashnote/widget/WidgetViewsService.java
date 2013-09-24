@@ -61,7 +61,11 @@ public class WidgetViewsService extends RemoteViewsService {
                         R.layout.widget_buttons);
 
                 Intent in = new Intent();
-                in.putExtra(FlashNoteWidgetProvider.ACTION_NEW, 0);
+                if (mModel.size() > 0) {
+                    in.putExtra(FlashNoteWidgetProvider.ACTION_NEW, 0);
+                } else {
+                    in.putExtra(FlashNoteWidgetProvider.ACTION_MANAGE, 0);
+                }
                 views.setOnClickFillInIntent(R.id.lo_item, in);
 
                 return views;
