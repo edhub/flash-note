@@ -16,5 +16,10 @@
     <string name="notification_title">事件提醒：</string>
     <string name="not_scheduled">无定时</string>
     <string name="recording_too_short">录音太短！</string>
+    <string name="help">帮助</string>
+    <string name="help_text">按住话筒按钮开始录音，放开按钮完成录音。
+        \n\n点击右边的颜色块来改变本条笔记的颜色。
+        \n\n添加一些描述，这样你一眼就能看明白记录的内容。你也可以过后来添加描述。
+        \n\n滑动进度条来为本条记录快速设置一个时间提醒（一个月以内）。</string>
 
 </resources>

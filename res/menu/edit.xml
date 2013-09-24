@@ -12,5 +12,11 @@
         android:orderInCategory="100"
         android:showAsAction="always"
         android:title="@android:string/yes"/>
+    <item
+        android:id="@+id/act_help"
+        android:onClick="showHelp"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/help"/>
 
 </menu>

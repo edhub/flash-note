@@ -16,5 +16,10 @@
     <string name="notification_title">Reminder:</string>
     <string name="not_scheduled">Not scheduled</string>
     <string name="recording_too_short">Recording is too short!</string>
+    <string name="help">Help</string>
+    <string name="help_text">Press the mic icon to start recording voice, and release it to finish recording. 
+        \n\nClick the color on the right to change the color for this note.
+        \n\nInput some description for the note so you can be reminded at a single glance. Or you can add description later.
+        \n\nSlide the progress bar to quickly schedule a date (within a month) for this note.</string>
 
 </resources>

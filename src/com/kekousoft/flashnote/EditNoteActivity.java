@@ -2,6 +2,7 @@
 package com.kekousoft.flashnote;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -248,6 +249,14 @@ public class EditNoteActivity extends Activity {
 
         mDiscardVoice = false;
         finish();
+    }
+
+    public void showHelp(MenuItem mi) {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setMessage(getString(R.string.help_text))
+                .setCancelable(true)
+                .setPositiveButton(android.R.string.ok, null)
+                .show();
     }
 
     private String getTime(int progress) {
